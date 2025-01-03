@@ -2,6 +2,7 @@ package com.example.stravaclient.client.swing.swingGUI;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -58,13 +59,13 @@ public class MainUI extends JFrame {
         setVisible(true);
     }
 
-    // Home Panel - Mantenido igual que en tu código original
     private JPanel createHomePanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
+        // Accepted Challenges Table
         modelChallengesAccepted = new DefaultTableModel(
-                new String[]{"Challenge Name", "Description", "Status"}, 0
+                new String[]{"Challenge Info", "Sport", "Goal", "Dates"}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -73,31 +74,57 @@ public class MainUI extends JFrame {
         };
 
         tableChallengesAccepted = new JTable(modelChallengesAccepted);
+        tableChallengesAccepted.setRowHeight(50);
+        tableChallengesAccepted.setFocusable(false);
+        tableChallengesAccepted.setShowGrid(false);
         JScrollPane scrollAccepted = new JScrollPane(tableChallengesAccepted);
         scrollAccepted.setBorder(BorderFactory.createTitledBorder("Accepted Challenges"));
 
-        modelChallengesAccepted.addRow(new Object[]{"10K Run", "Complete a 10K run this month", "In Progress"});
-        modelChallengesAccepted.addRow(new Object[]{"Climb Challenge", "Climb 1000m this week", "Started"});
+        // Ejemplo de datos formato HTML para Accepted Challenges
+        String challenge1 = String.format("<html><b>%s</b></html>", "Summer Running Challenge");
+        String goal1 = String.format("<html>Distance<br/><b>100 km</b></html>");
+        String dates1 = String.format("<html>Start: %s<br/>End: %s</html>", "2024-01-01", "2024-02-01");
+        modelChallengesAccepted.addRow(new Object[]{challenge1, "Running", goal1, dates1});
 
+        // Add Challenge Button
         JButton btnAddChallenge = new JButton("Create New Challenge");
+        btnAddChallenge.addActionListener(e -> showAddChallengeDialog());
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.add(btnAddChallenge);
 
+        // Available Challenges Table with Accept button
         modelChallengesAvailable = new DefaultTableModel(
-                new String[]{"Challenge Name", "Description", "Difficulty"}, 0
+                new String[]{"Challenge Info", "Sport", "Goal", "Dates", "Action"}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false;
+                return column == 4; // Solo la columna del botón es editable
+            }
+
+            @Override
+            public Class<?> getColumnClass(int column) {
+                return column == 4 ? JButton.class : Object.class;
             }
         };
 
         tableChallengesAvailable = new JTable(modelChallengesAvailable);
+        tableChallengesAvailable.setRowHeight(50);
+        tableChallengesAvailable.setFocusable(false);
+        tableChallengesAvailable.setShowGrid(false);
+
+        // Configurar el renderer para los botones
+        tableChallengesAvailable.getColumn("Action").setCellRenderer(new ButtonRenderer());
+        tableChallengesAvailable.getColumn("Action").setCellEditor(new ButtonEditor(new JCheckBox()));
+
         JScrollPane scrollAvailable = new JScrollPane(tableChallengesAvailable);
         scrollAvailable.setBorder(BorderFactory.createTitledBorder("Available Challenges"));
 
-        modelChallengesAvailable.addRow(new Object[]{"Marathon Prep", "Complete 4 runs of 15K each", "Hard"});
-        modelChallengesAvailable.addRow(new Object[]{"Daily Cyclist", "Bike 5km daily for a month", "Medium"});
+        // Ejemplo de datos formato HTML para Available Challenges
+        String challenge2 = String.format("<html><b>%s</b></html>", "Mountain Biking Week");
+        String goal2 = String.format("<html>Time<br/><b>20 hours</b></html>");
+        String dates2 = String.format("<html>Start: %s<br/>End: %s</html>", "2024-02-01", "2024-02-28");
+        JButton acceptButton = new JButton("Accept");
+        modelChallengesAvailable.addRow(new Object[]{challenge2, "Cycling", goal2, dates2, "Accept"});
 
         panel.add(scrollAccepted);
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
@@ -106,6 +133,180 @@ public class MainUI extends JFrame {
         panel.add(scrollAvailable);
 
         return panel;
+    }
+
+    // Clase para renderizar los botones en la tabla
+    class ButtonRenderer extends JButton implements TableCellRenderer {
+        public ButtonRenderer() {
+            setOpaque(true);
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                                                       boolean isSelected, boolean hasFocus, int row, int column) {
+            setText(value.toString());
+            return this;
+        }
+    }
+
+    // Clase para manejar los clics en los botones
+    class ButtonEditor extends DefaultCellEditor {
+        protected JButton button;
+        private String label;
+        private boolean isPushed;
+
+        public ButtonEditor(JCheckBox checkBox) {
+            super(checkBox);
+            button = new JButton();
+            button.setOpaque(true);
+            button.addActionListener(e -> fireEditingStopped());
+        }
+
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value,
+                                                     boolean isSelected, int row, int column) {
+            label = value.toString();
+            button.setText(label);
+            isPushed = true;
+            return button;
+        }
+
+        @Override
+        public Object getCellEditorValue() {
+            if (isPushed) {
+                // Aquí manejamos la acción del botón
+                int selectedRow = tableChallengesAvailable.getSelectedRow();
+                if (selectedRow != -1) {
+                    // Obtener los datos de la fila seleccionada
+                    Object[] rowData = new Object[4];
+                    for (int i = 0; i < 4; i++) {
+                        rowData[i] = modelChallengesAvailable.getValueAt(selectedRow, i);
+                    }
+
+                    // Añadir a challenges aceptados
+                    modelChallengesAccepted.addRow(rowData);
+
+                    // Eliminar de challenges disponibles
+                    modelChallengesAvailable.removeRow(selectedRow);
+                }
+            }
+            isPushed = false;
+            return label;
+        }
+
+        @Override
+        public boolean stopCellEditing() {
+            isPushed = false;
+            return super.stopCellEditing();
+        }
+    }
+
+    private void showAddChallengeDialog() {
+        JDialog dialog = new JDialog(this, "Add New Challenge", true);
+        dialog.setLayout(new BorderLayout());
+
+        JPanel form = new JPanel(new GridLayout(0, 2, 10, 10));
+        form.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        // Name
+        form.add(new JLabel("Name:"));
+        JTextField nameField = new JTextField();
+        form.add(nameField);
+
+        // Sport type
+        form.add(new JLabel("Sport:"));
+        String[] sports = {"Running", "Cycling", "Swimming", "Walking", "Hiking"};
+        JComboBox<String> sportCombo = new JComboBox<>(sports);
+        form.add(sportCombo);
+
+        // Goal Type
+        form.add(new JLabel("Goal Type:"));
+        String[] goalTypes = {"distance", "time"};
+        JComboBox<String> goalTypeCombo = new JComboBox<>(goalTypes);
+        form.add(goalTypeCombo);
+
+        // Goal Value
+        form.add(new JLabel("Goal Value:"));
+        JSpinner goalSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 1000, 1));
+        form.add(goalSpinner);
+
+        // Start Date
+        form.add(new JLabel("Start Date:"));
+        JPanel startDatePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JComboBox<Integer> startDayCombo = new JComboBox<>(generateNumbers(1, 31));
+        JComboBox<Integer> startMonthCombo = new JComboBox<>(generateNumbers(1, 12));
+        JComboBox<Integer> startYearCombo = new JComboBox<>(generateNumbers(2024, 2025));
+        startDatePanel.add(startDayCombo);
+        startDatePanel.add(new JLabel("/"));
+        startDatePanel.add(startMonthCombo);
+        startDatePanel.add(new JLabel("/"));
+        startDatePanel.add(startYearCombo);
+        form.add(startDatePanel);
+
+        // End Date
+        form.add(new JLabel("End Date:"));
+        JPanel endDatePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JComboBox<Integer> endDayCombo = new JComboBox<>(generateNumbers(1, 31));
+        JComboBox<Integer> endMonthCombo = new JComboBox<>(generateNumbers(1, 12));
+        JComboBox<Integer> endYearCombo = new JComboBox<>(generateNumbers(2024, 2025));
+        endDatePanel.add(endDayCombo);
+        endDatePanel.add(new JLabel("/"));
+        endDatePanel.add(endMonthCombo);
+        endDatePanel.add(new JLabel("/"));
+        endDatePanel.add(endYearCombo);
+        form.add(endDatePanel);
+
+        // Buttons
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton saveButton = new JButton("Save");
+        JButton cancelButton = new JButton("Cancel");
+
+        saveButton.addActionListener(e -> {
+            // Format dates
+            String startDate = String.format("%d-%02d-%02d",
+                    startYearCombo.getSelectedItem(),
+                    startMonthCombo.getSelectedItem(),
+                    startDayCombo.getSelectedItem());
+
+            String endDate = String.format("%d-%02d-%02d",
+                    endYearCombo.getSelectedItem(),
+                    endMonthCombo.getSelectedItem(),
+                    endDayCombo.getSelectedItem());
+
+            // Create HTML formatted cells
+            String challengeInfo = String.format("<html><b>%s</b></html>",
+                    nameField.getText());
+
+            String goalInfo = String.format("<html>%s<br/><b>%d %s</b></html>",
+                    goalTypeCombo.getSelectedItem(),
+                    goalSpinner.getValue(),
+                    goalTypeCombo.getSelectedItem().equals("distance") ? "km" : "hours");
+
+            String datesInfo = String.format("<html>Start: %s<br/>End: %s</html>",
+                    startDate, endDate);
+
+            // Add to available challenges table
+            modelChallengesAvailable.addRow(new Object[]{
+                    challengeInfo,
+                    sportCombo.getSelectedItem(),
+                    goalInfo,
+                    datesInfo
+            });
+
+            dialog.dispose();
+        });
+
+        cancelButton.addActionListener(e -> dialog.dispose());
+
+        buttonPanel.add(saveButton);
+        buttonPanel.add(cancelButton);
+
+        dialog.add(form, BorderLayout.CENTER);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
+
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
     }
 
     // Sessions Panel - Nueva implementación
@@ -340,8 +541,6 @@ public class MainUI extends JFrame {
 
         // Botón de logout
         JButton btnLogout = new JButton("Logout");
-        btnLogout.setBackground(new Color(220, 53, 69));
-        btnLogout.setForeground(Color.WHITE);
         btnLogout.setFocusPainted(false);
         btnLogout.addActionListener(e -> {
             new Login();
