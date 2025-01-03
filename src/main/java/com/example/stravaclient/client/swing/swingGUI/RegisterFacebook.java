@@ -21,7 +21,7 @@ public class RegisterFacebook extends JFrame {
 
     public RegisterFacebook() {
         setTitle("Register - Strava");
-        setSize(420, 750); // Increased height for more fields
+        setSize(500, 800); // Increased height for more fields
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
@@ -30,6 +30,7 @@ public class RegisterFacebook extends JFrame {
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "Cancel");
         getRootPane().getActionMap().put("Cancel", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
+                new Login();
                 dispose();
             }
         });
@@ -48,7 +49,7 @@ public class RegisterFacebook extends JFrame {
         logoContainer.setPreferredSize(new Dimension(80, 80));
         logoContainer.setLayout(new BorderLayout());
 
-        ImageIcon logo = new ImageIcon("/Users/ibonarambarri/IdeaProjects/SD/sample_code/StravaClient/src/main/resources/img/facebook.png");
+        ImageIcon logo = new ImageIcon("src/main/resources/img/facebook.png");
         Image logoScaled = logo.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
         JLabel lblLogo = new JLabel(new ImageIcon(logoScaled));
         logoContainer.add(lblLogo, BorderLayout.CENTER);

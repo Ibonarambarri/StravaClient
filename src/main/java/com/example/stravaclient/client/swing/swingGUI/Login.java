@@ -24,7 +24,7 @@ public class Login extends JFrame {
 
     public Login() {
         setTitle("Strava");
-        setSize(420, 650);
+        setSize(500, 800);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
@@ -51,7 +51,7 @@ public class Login extends JFrame {
         imageContainer.setLayout(new BorderLayout());
 
         // Crear el JLabel con la imagen
-        ImageIcon logo = new ImageIcon("/Users/ibonarambarri/IdeaProjects/SD/sample_code/StravaClient/src/main/resources/img/usuario.png");
+        ImageIcon logo = new ImageIcon("src/main/resources/img/usuario.png");
         Image logoEsc = logo.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
         JLabel lblLogo = new JLabel(new ImageIcon(logoEsc));
 
@@ -70,7 +70,7 @@ public class Login extends JFrame {
         JPanel pUsuario = new JPanel(new BorderLayout());
         pUsuario.setBackground(new Color(34, 66, 90));
 
-        JLabel lblLogoU = new JLabel(new ImageIcon(new ImageIcon("/Users/ibonarambarri/IdeaProjects/SD/sample_code/StravaClient/src/main/resources/img/tarjeta-de-identificacion.png").getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH)));
+        JLabel lblLogoU = new JLabel(new ImageIcon(new ImageIcon("src/main/resources/img/tarjeta-de-identificacion.png").getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH)));
         lblLogoU.setPreferredSize(new Dimension(45, 45));
         txtUsuario = new JTextField();
         txtUsuario.setPreferredSize(new Dimension(200, 40));
@@ -88,7 +88,7 @@ public class Login extends JFrame {
         JPanel pPassword = new JPanel(new BorderLayout());
         pPassword.setBackground(new Color(34, 66, 90));
 
-        JLabel lblLogoC = new JLabel(new ImageIcon(new ImageIcon("/Users/ibonarambarri/IdeaProjects/SD/sample_code/StravaClient/src/main/resources/img/candado.png").getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH)));
+        JLabel lblLogoC = new JLabel(new ImageIcon(new ImageIcon("src/main/resources/img/candado.png").getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH)));
         lblLogoC.setPreferredSize(new Dimension(45, 45));
         txtPassw = new JPasswordField();
         txtPassw.setPreferredSize(new Dimension(200, 40));
@@ -135,7 +135,7 @@ public class Login extends JFrame {
         bIniciarSesion.setBorderPainted(false); // Remover el borde
         bIniciarSesion.setFont(new Font("SansSerif", Font.BOLD, 18));
         bIniciarSesion.addActionListener(e -> {
-            new Login();
+            new MainUI();
             dispose();
         });
         pBotones.add(bIniciarSesion);
@@ -157,7 +157,7 @@ public class Login extends JFrame {
         pSocialMedia.setBackground(Color.WHITE);
 
         // Google login button
-        ImageIcon googleIcon = new ImageIcon("/Users/ibonarambarri/IdeaProjects/SD/sample_code/StravaClient/src/main/resources/img/google.png");
+        ImageIcon googleIcon = new ImageIcon("src/main/resources/img/google.png");
         Image googleScaled = googleIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
         JButton btnGoogle = new JButton(new ImageIcon(googleScaled));
         btnGoogle.setBorderPainted(false);
@@ -169,7 +169,7 @@ public class Login extends JFrame {
         });
 
         // Facebook login button
-        ImageIcon fbIcon = new ImageIcon("/Users/ibonarambarri/IdeaProjects/SD/sample_code/StravaClient/src/main/resources/img/facebook.png");
+        ImageIcon fbIcon = new ImageIcon("src/main/resources/img/facebook.png");
         Image fbScaled = fbIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
         JButton btnFacebook = new JButton(new ImageIcon(fbScaled));
         btnFacebook.setBorderPainted(false);
