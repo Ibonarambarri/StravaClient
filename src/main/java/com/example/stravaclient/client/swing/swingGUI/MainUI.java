@@ -4,22 +4,19 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.util.Calendar;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.JPopupMenu;
+import javax.swing.JMenuItem;
 
 public class MainUI extends JFrame {
     private JTable tableChallengesAccepted;
     private JTable tableChallengesAvailable;
-    private JTable tableSessions;
     private DefaultTableModel modelChallengesAccepted;
     private DefaultTableModel modelChallengesAvailable;
     private DefaultTableModel modelSessions;
-    private JPanel panelHome;
-    private JPanel panelSessions;
-    private JPanel panelProfile;
-    private JPanel panelContent;
+    private final JPanel panelContent;
 
     public MainUI() {
         setTitle("Strava Client");
@@ -30,9 +27,9 @@ public class MainUI extends JFrame {
 
         panelContent = new JPanel(new CardLayout());
 
-        panelHome = createHomePanel();
-        panelSessions = createSessionsPanel();
-        panelProfile = createProfilePanel();
+        JPanel panelHome = createHomePanel();
+        JPanel panelSessions = createSessionsPanel();
+        JPanel panelProfile = createProfilePanel();
 
         panelContent.add(panelHome, "Home");
         panelContent.add(panelSessions, "Sessions");
@@ -63,9 +60,9 @@ public class MainUI extends JFrame {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        // Accepted Challenges Table
+        // Accepted Challenges Table con barra de progreso
         modelChallengesAccepted = new DefaultTableModel(
-                new String[]{"Challenge Info", "Sport", "Goal", "Dates"}, 0
+                new String[]{"Challenge Info", "Sport", "Goal", "Dates", "Progress"}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -77,14 +74,18 @@ public class MainUI extends JFrame {
         tableChallengesAccepted.setRowHeight(50);
         tableChallengesAccepted.setFocusable(false);
         tableChallengesAccepted.setShowGrid(false);
+
+        // Configurar el renderer para la barra de progreso
+        tableChallengesAccepted.getColumnModel().getColumn(4).setCellRenderer(new ProgressRenderer());
+
         JScrollPane scrollAccepted = new JScrollPane(tableChallengesAccepted);
         scrollAccepted.setBorder(BorderFactory.createTitledBorder("Accepted Challenges"));
 
-        // Ejemplo de datos formato HTML para Accepted Challenges
+        // Ejemplo de datos con barra de progreso
         String challenge1 = String.format("<html><b>%s</b></html>", "Summer Running Challenge");
-        String goal1 = String.format("<html>Distance<br/><b>100 km</b></html>");
+        String goal1 = "<html>Distance<br/><b>100 km</b></html>";
         String dates1 = String.format("<html>Start: %s<br/>End: %s</html>", "2024-01-01", "2024-02-01");
-        modelChallengesAccepted.addRow(new Object[]{challenge1, "Running", goal1, dates1});
+        modelChallengesAccepted.addRow(new Object[]{challenge1, "Running", goal1, dates1, 0.75}); // 75% de progreso
 
         // Add Challenge Button
         JButton btnAddChallenge = new JButton("Create New Challenge");
@@ -92,13 +93,45 @@ public class MainUI extends JFrame {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.add(btnAddChallenge);
 
+        // Añadir al método createHomePanel()
+        JPopupMenu popupMenu = new JPopupMenu();
+        JMenuItem deleteItem = new JMenuItem("Eliminar Reto");
+        deleteItem.addActionListener(e -> {
+            int row = tableChallengesAccepted.getSelectedRow();
+            if (row != -1) {
+                int confirm = JOptionPane.showConfirmDialog(
+                        this,
+                        "¿Estás seguro de que quieres eliminar este reto?",
+                        "Confirmar Eliminación",
+                        JOptionPane.YES_NO_OPTION);
+
+                if (confirm == JOptionPane.YES_OPTION) {
+                    modelChallengesAccepted.removeRow(row);
+                }
+            }
+        });
+        popupMenu.add(deleteItem);
+
+        tableChallengesAccepted.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    int row = tableChallengesAccepted.rowAtPoint(e.getPoint());
+                    if (row >= 0 && row < tableChallengesAccepted.getRowCount()) {
+                        tableChallengesAccepted.setRowSelectionInterval(row, row);
+                        popupMenu.show(e.getComponent(), e.getX(), e.getY());
+                    }
+                }
+            }
+        });
+
         // Available Challenges Table with Accept button
         modelChallengesAvailable = new DefaultTableModel(
                 new String[]{"Challenge Info", "Sport", "Goal", "Dates", "Action"}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column == 4; // Solo la columna del botón es editable
+                return column == 4;
             }
 
             @Override
@@ -112,18 +145,16 @@ public class MainUI extends JFrame {
         tableChallengesAvailable.setFocusable(false);
         tableChallengesAvailable.setShowGrid(false);
 
-        // Configurar el renderer para los botones
         tableChallengesAvailable.getColumn("Action").setCellRenderer(new ButtonRenderer());
         tableChallengesAvailable.getColumn("Action").setCellEditor(new ButtonEditor(new JCheckBox()));
 
         JScrollPane scrollAvailable = new JScrollPane(tableChallengesAvailable);
         scrollAvailable.setBorder(BorderFactory.createTitledBorder("Available Challenges"));
 
-        // Ejemplo de datos formato HTML para Available Challenges
+        // Ejemplo de datos
         String challenge2 = String.format("<html><b>%s</b></html>", "Mountain Biking Week");
-        String goal2 = String.format("<html>Time<br/><b>20 hours</b></html>");
+        String goal2 = "<html>Time<br/><b>20 hours</b></html>";
         String dates2 = String.format("<html>Start: %s<br/>End: %s</html>", "2024-02-01", "2024-02-28");
-        JButton acceptButton = new JButton("Accept");
         modelChallengesAvailable.addRow(new Object[]{challenge2, "Cycling", goal2, dates2, "Accept"});
 
         panel.add(scrollAccepted);
@@ -133,72 +164,6 @@ public class MainUI extends JFrame {
         panel.add(scrollAvailable);
 
         return panel;
-    }
-
-    // Clase para renderizar los botones en la tabla
-    class ButtonRenderer extends JButton implements TableCellRenderer {
-        public ButtonRenderer() {
-            setOpaque(true);
-        }
-
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value,
-                                                       boolean isSelected, boolean hasFocus, int row, int column) {
-            setText(value.toString());
-            return this;
-        }
-    }
-
-    // Clase para manejar los clics en los botones
-    class ButtonEditor extends DefaultCellEditor {
-        protected JButton button;
-        private String label;
-        private boolean isPushed;
-
-        public ButtonEditor(JCheckBox checkBox) {
-            super(checkBox);
-            button = new JButton();
-            button.setOpaque(true);
-            button.addActionListener(e -> fireEditingStopped());
-        }
-
-        @Override
-        public Component getTableCellEditorComponent(JTable table, Object value,
-                                                     boolean isSelected, int row, int column) {
-            label = value.toString();
-            button.setText(label);
-            isPushed = true;
-            return button;
-        }
-
-        @Override
-        public Object getCellEditorValue() {
-            if (isPushed) {
-                // Aquí manejamos la acción del botón
-                int selectedRow = tableChallengesAvailable.getSelectedRow();
-                if (selectedRow != -1) {
-                    // Obtener los datos de la fila seleccionada
-                    Object[] rowData = new Object[4];
-                    for (int i = 0; i < 4; i++) {
-                        rowData[i] = modelChallengesAvailable.getValueAt(selectedRow, i);
-                    }
-
-                    // Añadir a challenges aceptados
-                    modelChallengesAccepted.addRow(rowData);
-
-                    // Eliminar de challenges disponibles
-                    modelChallengesAvailable.removeRow(selectedRow);
-                }
-            }
-            isPushed = false;
-            return label;
-        }
-
-        @Override
-        public boolean stopCellEditing() {
-            isPushed = false;
-            return super.stopCellEditing();
-        }
     }
 
     private void showAddChallengeDialog() {
@@ -262,6 +227,63 @@ public class MainUI extends JFrame {
         JButton cancelButton = new JButton("Cancel");
 
         saveButton.addActionListener(e -> {
+            // Validar nombre
+            if (nameField.getText().trim().isEmpty()) {
+                JOptionPane.showMessageDialog(dialog,
+                        "El nombre del reto no puede estar vacío",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Validar valor del objetivo
+            if ((Integer)goalSpinner.getValue() <= 0) {
+                JOptionPane.showMessageDialog(dialog,
+                        "El objetivo debe ser mayor que 0",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Validar fechas
+            Calendar startCal = Calendar.getInstance();
+            startCal.set(
+                    (Integer)startYearCombo.getSelectedItem(),
+                    (Integer)startMonthCombo.getSelectedItem() - 1,
+                    (Integer)startDayCombo.getSelectedItem()
+            );
+
+            Calendar endCal = Calendar.getInstance();
+            endCal.set(
+                    (Integer)endYearCombo.getSelectedItem(),
+                    (Integer)endMonthCombo.getSelectedItem() - 1,
+                    (Integer)endDayCombo.getSelectedItem()
+            );
+
+            Calendar today = Calendar.getInstance();
+            today.set(Calendar.HOUR_OF_DAY, 0);
+            today.set(Calendar.MINUTE, 0);
+            today.set(Calendar.SECOND, 0);
+            today.set(Calendar.MILLISECOND, 0);
+
+            // Validar que la fecha de inicio no sea anterior a hoy
+            if (startCal.before(today)) {
+                JOptionPane.showMessageDialog(dialog,
+                        "La fecha de inicio no puede ser anterior a hoy",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Validar que la fecha de fin no sea anterior a la de inicio
+            if (endCal.before(startCal)) {
+                JOptionPane.showMessageDialog(dialog,
+                        "La fecha de fin no puede ser anterior a la fecha de inicio",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             // Format dates
             String startDate = String.format("%d-%02d-%02d",
                     startYearCombo.getSelectedItem(),
@@ -275,7 +297,7 @@ public class MainUI extends JFrame {
 
             // Create HTML formatted cells
             String challengeInfo = String.format("<html><b>%s</b></html>",
-                    nameField.getText());
+                    nameField.getText().trim());
 
             String goalInfo = String.format("<html>%s<br/><b>%d %s</b></html>",
                     goalTypeCombo.getSelectedItem(),
@@ -290,7 +312,8 @@ public class MainUI extends JFrame {
                     challengeInfo,
                     sportCombo.getSelectedItem(),
                     goalInfo,
-                    datesInfo
+                    datesInfo,
+                    "Accept"
             });
 
             dialog.dispose();
@@ -309,6 +332,94 @@ public class MainUI extends JFrame {
         dialog.setVisible(true);
     }
 
+    // Renderer para la barra de progreso
+    static class ProgressRenderer extends JProgressBar implements TableCellRenderer {
+        public ProgressRenderer() {
+            super(0, 100);
+            setStringPainted(true);
+            setBackground(Color.WHITE);
+            setForeground(new Color(46, 139, 87)); // Verde oscuro
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                                                       boolean isSelected, boolean hasFocus,
+                                                       int row, int column) {
+            if (value instanceof Double) {
+                double progress = (Double) value;
+                setValue((int) (progress * 100));
+                setString(String.format("%.0f%%", progress * 100));
+            }
+            return this;
+        }
+    }
+
+    // Renderer para los botones
+    static class ButtonRenderer extends JButton implements TableCellRenderer {
+        public ButtonRenderer() {
+            setOpaque(true);
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                                                       boolean isSelected, boolean hasFocus,
+                                                       int row, int column) {
+            setText(value.toString());
+            return this;
+        }
+    }
+
+    // Editor para los botones con manejo correcto de datos
+    class ButtonEditor extends DefaultCellEditor {
+        protected JButton button;
+        private String label;
+        private boolean isPushed;
+
+        public ButtonEditor(JCheckBox checkBox) {
+            super(checkBox);
+            button = new JButton();
+            button.setOpaque(true);
+            button.addActionListener(e -> fireEditingStopped());
+        }
+
+        @Override
+        public Component getTableCellEditorComponent(JTable table, Object value,
+                                                     boolean isSelected, int row, int column) {
+            label = value.toString();
+            button.setText(label);
+            isPushed = true;
+            return button;
+        }
+
+        @Override
+        public Object getCellEditorValue() {
+            if (isPushed) {
+                int selectedRow = tableChallengesAvailable.getSelectedRow();
+                if (selectedRow != -1) {
+                    // Crear array con los datos necesarios y la barra de progreso inicial
+                    Object[] rowData = new Object[5];
+                    for (int i = 0; i < 4; i++) {
+                        rowData[i] = modelChallengesAvailable.getValueAt(selectedRow, i);
+                    }
+                    rowData[4] = 0.0; // Progreso inicial 0%
+
+                    // Añadir a challenges aceptados
+                    modelChallengesAccepted.addRow(rowData);
+
+                    // Eliminar de challenges disponibles
+                    modelChallengesAvailable.removeRow(selectedRow);
+                }
+            }
+            isPushed = false;
+            return label;
+        }
+
+        @Override
+        public boolean stopCellEditing() {
+            isPushed = false;
+            return super.stopCellEditing();
+        }
+    }
     // Sessions Panel - Nueva implementación
     private JPanel createSessionsPanel() {
         JPanel panel = new JPanel(new BorderLayout());
@@ -323,15 +434,15 @@ public class MainUI extends JFrame {
 
         // Sessions Table with HTML formatting
         modelSessions = new DefaultTableModel(
-                new String[]{"Session Info", "Sport", "Distance", "Date", "Time"}, 0
-        ) {
+                new String[]{"Session Info", "Sport", "Distance", "Date", "Time", "Duration"}, 0
+        ){
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
 
-        tableSessions = new JTable(modelSessions);
+        JTable tableSessions = new JTable(modelSessions);
         tableSessions.setRowHeight(60); // Altura aumentada para contenido HTML
         tableSessions.setFocusable(false);
         tableSessions.setShowGrid(false);
@@ -419,6 +530,24 @@ public class MainUI extends JFrame {
         JButton cancelButton = new JButton("Cancel");
 
         saveButton.addActionListener(e -> {
+            // Validar título
+            if (titleField.getText().trim().isEmpty()) {
+                JOptionPane.showMessageDialog(dialog,
+                        "El título no puede estar vacío",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Validar distancia
+            if ((Double)distanceSpinner.getValue() <= 0) {
+                JOptionPane.showMessageDialog(dialog,
+                        "La distancia debe ser mayor que 0",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             // Format date and time
             String date = String.format("%d-%02d-%02d",
                     yearCombo.getSelectedItem(),
@@ -435,19 +564,18 @@ public class MainUI extends JFrame {
                     secondsSpinner.getValue());
 
             // Create HTML formatted cell
-            String titleCell = String.format("<html><b>%s</b><br/>%s km<br/><span style='color:gray'>%s</span></html>",
-                    titleField.getText(),
+            String sessionInfo = String.format("<html><b>%s</b><br/>%s km<br/><span style='color:gray'>%s</span></html>",
+                    titleField.getText().trim(),
                     distanceSpinner.getValue(),
                     duration);
 
             // Add to table
             modelSessions.addRow(new Object[]{
-                    titleCell,
+                    sessionInfo,
                     sportCombo.getSelectedItem(),
                     distanceSpinner.getValue(),
                     date,
-                    time,
-                    duration
+                    time
             });
 
             dialog.dispose();
@@ -591,6 +719,6 @@ public class MainUI extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new MainUI());
+        SwingUtilities.invokeLater(MainUI::new);
     }
 }
