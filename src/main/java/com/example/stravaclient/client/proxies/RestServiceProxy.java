@@ -21,6 +21,11 @@ public class RestServiceProxy implements IStravaServiceProxy {
     public RestServiceProxy(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
+
+    public RestServiceProxy() {
+
+    }
+
     @Override
     public String register(User user, String method, String password) {
         String url =serverUrl + "/api/users";
