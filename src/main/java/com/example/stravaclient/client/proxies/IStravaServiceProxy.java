@@ -11,14 +11,14 @@ public interface IStravaServiceProxy {
     String register(User user, String method, String password);
     String login(String email, String method, String password);
     String logout(String token);
-    User getUserByToken(String token);
+
 
     // Challenge management
 
 
     String createChallenge(Challenge challenge, String token);
     List<Challenge> getActiveChallenges();
-    String acceptChallenge(String token, Challenge challenge);
+    String acceptChallenge(String token, int id);
     HashMap<String, String> getChallengeStatus(String token);
 
     // Session management

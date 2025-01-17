@@ -12,19 +12,5 @@ public record User(
         Integer maxHeartRate,
         Integer restHeartRate
 ) {
-
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User that = (User) o;
-        return Objects.equals(email, that.email) && Objects.equals(name, that.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(email, name);
-    }
 }
 
