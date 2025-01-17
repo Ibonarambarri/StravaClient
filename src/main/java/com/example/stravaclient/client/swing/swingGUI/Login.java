@@ -1,26 +1,10 @@
 package com.example.stravaclient.client.swing.swingGUI;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-
+import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 public class Login extends JFrame {
-    private static final long serialVersionUID = 1L;
-    private JPanel mainPanel;
-    private JPanel pLogo;
-    private JPanel pCentral;
-    private JPanel pBotones;
-    private JPanel pSocialMedia;
-
-    private JTextField txtUsuario;
-    private JPasswordField txtPassw;
-
-    private JLabel lblLogo;
-    private JCheckBox cbRememberMe;
-    private JLabel lblForgotPassword;
-    private JButton bIniciarSesion;
 
     public Login() {
         setTitle("Strava");
@@ -28,196 +12,195 @@ public class Login extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        mainPanel = new JPanel(new BorderLayout());
+        // Configurar la tecla ESC para cerrar
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+                .put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "Cancel");
+        getRootPane().getActionMap().put("Cancel", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+            }
+        });
+
+        JPanel mainPanel = new JPanel(new BorderLayout(0, 20));
         mainPanel.setBackground(Color.WHITE);
-        mainPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
+        mainPanel.setBorder(new EmptyBorder(30, 40, 30, 40));
 
-        //---------------------------- LOGO -----------------------------
-        pLogo = new JPanel();
-        pLogo.setBackground(Color.WHITE);
-        pLogo.setBorder(new EmptyBorder(20, 0, 100, 0)); // Espacio adicional arriba
+        // Panel del logo
+        JPanel logoPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        logoPanel.setBackground(Color.WHITE);
+        logoPanel.setBorder(new EmptyBorder(0, 0, 20, 0));
 
-        // Imagen del usuario como logo
+        JPanel logoContainer = new JPanel();
+        logoContainer.setBackground(new Color(63, 73, 112));
+        logoContainer.setPreferredSize(new Dimension(150, 150));
+        logoContainer.setLayout(new BorderLayout());
 
-
-        JPanel pLogo = new JPanel();
-        pLogo.setBackground(Color.WHITE);
-        pLogo.setBorder(new EmptyBorder(20, 0, 50, 0));
-
-        // Crear un JPanel para envolver la imagen y aplicar el fondo rojo
-        JPanel imageContainer = new JPanel();
-        imageContainer.setBackground(new Color(63, 73, 112)); // Fondo rojo
-        imageContainer.setPreferredSize(new Dimension(150, 150)); // Tamaño del contenedor
-        imageContainer.setLayout(new BorderLayout());
-
-        // Crear el JLabel con la imagen
         ImageIcon logo = new ImageIcon("src/main/resources/img/usuario.png");
         Image logoEsc = logo.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
         JLabel lblLogo = new JLabel(new ImageIcon(logoEsc));
+        logoContainer.add(lblLogo, BorderLayout.CENTER);
 
-        // No es necesario poner el fondo del JLabel, solo del contenedor
-        imageContainer.add(lblLogo, BorderLayout.CENTER);
+        logoPanel.add(logoContainer);
+        mainPanel.add(logoPanel, BorderLayout.NORTH);
 
-        // Añadir el contenedor con la imagen al panel pLogo
-        pLogo.add(imageContainer);
-        mainPanel.add(pLogo, BorderLayout.NORTH);
+        // Panel central con título y formulario
+        JPanel contentPanel = new JPanel(new BorderLayout(0, 20));
+        contentPanel.setBackground(Color.WHITE);
 
-        //---------------------------- PANEL CENTRAL ---------------------
-        pCentral = new JPanel(new GridLayout(5, 1, 5, 5)); // Reducido el espaciado vertical
-        pCentral.setBackground(Color.WHITE);
+        JLabel lblTitle = new JLabel("Login", SwingConstants.CENTER);
+        lblTitle.setFont(new Font("SansSerif", Font.BOLD, 24));
+        lblTitle.setForeground(new Color(34, 66, 90));
+        contentPanel.add(lblTitle, BorderLayout.NORTH);
 
-        // Panel de usuario
-        JPanel pUsuario = new JPanel(new BorderLayout());
-        pUsuario.setBackground(new Color(34, 66, 90));
+        // Panel del formulario
+        JPanel formPanel = new JPanel(new GridLayout(6, 1, 0, 5));
+        formPanel.setBackground(Color.WHITE);
 
-        JLabel lblLogoU = new JLabel(new ImageIcon(new ImageIcon("src/main/resources/img/tarjeta-de-identificacion.png").getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH)));
-        lblLogoU.setPreferredSize(new Dimension(45, 45));
-        txtUsuario = new JTextField();
-        txtUsuario.setPreferredSize(new Dimension(200, 40));
-        txtUsuario.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(42, 112, 165), 2),
-                new EmptyBorder(5, 10, 5, 10)));
-        txtUsuario.setFont(new Font("SansSerif", Font.PLAIN, 16));
-        txtUsuario.setBackground(new Color(42, 112, 165));
-        txtUsuario.setForeground(Color.WHITE);
+        // Campo de usuario
+        JPanel userPanel = new JPanel(new BorderLayout(10, 0));
+        userPanel.setBackground(Color.WHITE);
 
-        pUsuario.add(lblLogoU, BorderLayout.WEST);
-        pUsuario.add(txtUsuario, BorderLayout.CENTER);
+        JTextField txtUsuario = createStyledTextField();
 
-        // Panel de contraseña
-        JPanel pPassword = new JPanel(new BorderLayout());
-        pPassword.setBackground(new Color(34, 66, 90));
+        userPanel.add(txtUsuario, BorderLayout.CENTER);
 
-        JLabel lblLogoC = new JLabel(new ImageIcon(new ImageIcon("src/main/resources/img/candado.png").getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH)));
-        lblLogoC.setPreferredSize(new Dimension(45, 45));
-        txtPassw = new JPasswordField();
-        txtPassw.setPreferredSize(new Dimension(200, 40));
-        txtPassw.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(42, 112, 165), 2),
-                new EmptyBorder(5, 10, 5, 10)));
-        txtPassw.setFont(new Font("SansSerif", Font.PLAIN, 16));
-        txtPassw.setBackground(new Color(42, 112, 165));
-        txtPassw.setForeground(Color.WHITE);
+        addFormField("Username:", userPanel, formPanel);
 
-        pPassword.add(lblLogoC, BorderLayout.WEST);
-        pPassword.add(txtPassw, BorderLayout.CENTER);
+        // Campo de contraseña
+        JPanel passPanel = new JPanel(new BorderLayout(10, 0));
+        passPanel.setBackground(Color.WHITE);
 
-        // Añadir los JTextField al panel central
-        pCentral.add(pUsuario);
-        pCentral.add(pPassword);
+        JPasswordField txtPassw = createStyledPasswordField();
 
-        // Checkbox de "Remember me" y opción de "Forgot Password?"
-        cbRememberMe = new JCheckBox("Remember me");
-        cbRememberMe.setBackground(Color.WHITE);
-        cbRememberMe.setForeground(Color.GRAY);
-        lblForgotPassword = new JLabel("Forgot Password?");
-        lblForgotPassword.setForeground(new Color(100, 149, 237));
-        lblForgotPassword.setFont(new Font("SansSerif", Font.PLAIN, 12));
 
-        JPanel optionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        passPanel.add(txtPassw, BorderLayout.CENTER);
+
+        addFormField("Password:", passPanel, formPanel);
+
+        JPanel optionsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
         optionsPanel.setBackground(Color.WHITE);
+
+        JCheckBox cbRememberMe = new JCheckBox("Remember me");
+        cbRememberMe.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        cbRememberMe.setBackground(Color.WHITE);
+        cbRememberMe.setForeground(new Color(100, 100, 100));
+
+        JLabel lblForgotPassword = new JLabel("Forgot Password?");
+        lblForgotPassword.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        lblForgotPassword.setForeground(new Color(42, 112, 165));
+        lblForgotPassword.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
         optionsPanel.add(cbRememberMe);
         optionsPanel.add(lblForgotPassword);
+        formPanel.add(optionsPanel);
 
-        pCentral.add(optionsPanel);
-        mainPanel.add(pCentral, BorderLayout.CENTER);
+        contentPanel.add(formPanel, BorderLayout.CENTER);
+        mainPanel.add(contentPanel, BorderLayout.CENTER);
 
-        //---------------------------- BOTÓN DE INICIAR SESIÓN ---------------------
-        pBotones = new JPanel();
-        pBotones.setBackground(Color.WHITE);
+        // Panel inferior con botón de login y redes sociales
+        JPanel southPanel = new JPanel();
+        southPanel.setLayout(new BoxLayout(southPanel, BoxLayout.Y_AXIS));
+        southPanel.setBackground(Color.WHITE);
+        southPanel.setBorder(new EmptyBorder(20, 0, 0, 0));
 
-        // Configuración del botón de inicio de sesión
-        bIniciarSesion = new JButton("LOGIN");
-        bIniciarSesion.setPreferredSize(new Dimension(300, 50));
+        // Botón de login
+        JButton bIniciarSesion = new JButton("LOGIN");
+        bIniciarSesion.setPreferredSize(new Dimension(200, 45));
         bIniciarSesion.setBackground(new Color(34, 66, 90));
         bIniciarSesion.setForeground(Color.WHITE);
-        bIniciarSesion.setOpaque(true); // Forzar el color de fondo
-        bIniciarSesion.setBorderPainted(false); // Remover el borde
-        bIniciarSesion.setFont(new Font("SansSerif", Font.BOLD, 18));
+        bIniciarSesion.setFont(new Font("SansSerif", Font.BOLD, 16));
+        bIniciarSesion.setOpaque(true);
+        bIniciarSesion.setBorderPainted(false);
+        bIniciarSesion.setCursor(new Cursor(Cursor.HAND_CURSOR));
         bIniciarSesion.addActionListener(e -> {
             new MainUI();
             dispose();
         });
-        pBotones.add(bIniciarSesion);
 
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.add(bIniciarSesion);
+        southPanel.add(buttonPanel);
 
-        //---------------------------- SOCIAL MEDIA PANEL ---------------------
-        // Create a container panel for both the text and social media buttons
-        JPanel pSocialContainer = new JPanel(new BorderLayout(0, 10));
-        pSocialContainer.setBackground(Color.WHITE);
+        // Panel de redes sociales
+        JLabel lblRegister = new JLabel("Register with:", SwingConstants.CENTER);
+        lblRegister.setFont(new Font("SansSerif", Font.BOLD, 14));
+        lblRegister.setForeground(new Color(34, 66, 90));
+        lblRegister.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // Add "Regístrate con:" text
-        JLabel lblRegistrate = new JLabel("Register with:", SwingConstants.CENTER);
-        lblRegistrate.setFont(new Font("SansSerif", Font.BOLD, 14));
-        lblRegistrate.setForeground(new Color(34, 66, 90));
-        pSocialContainer.add(lblRegistrate, BorderLayout.NORTH);
+        JPanel socialButtonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        socialButtonsPanel.setBackground(Color.WHITE);
 
-        // Create panel for social media icons
-        pSocialMedia = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
-        pSocialMedia.setBackground(Color.WHITE);
+        // Botones de redes sociales
+        JButton googleButton = createSocialButton("src/main/resources/img/google.png", new RegisterGoogle());
+        JButton facebookButton = createSocialButton("src/main/resources/img/facebook.png", new RegisterFacebook());
 
-        // Google login button
-        ImageIcon googleIcon = new ImageIcon("src/main/resources/img/google.png");
-        Image googleScaled = googleIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
-        JButton btnGoogle = new JButton(new ImageIcon(googleScaled));
-        btnGoogle.setBorderPainted(false);
-        btnGoogle.setContentAreaFilled(false);
-        btnGoogle.setFocusPainted(false);
-        btnGoogle.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnGoogle.addActionListener(e -> {
-            new RegisterGoogle();
-        });
+        socialButtonsPanel.add(googleButton);
+        socialButtonsPanel.add(facebookButton);
 
-        // Facebook login button
-        ImageIcon fbIcon = new ImageIcon("src/main/resources/img/facebook.png");
-        Image fbScaled = fbIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
-        JButton btnFacebook = new JButton(new ImageIcon(fbScaled));
-        btnFacebook.setBorderPainted(false);
-        btnFacebook.setContentAreaFilled(false);
-        btnFacebook.setFocusPainted(false);
-        btnFacebook.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnFacebook.addActionListener(e -> {
-            new RegisterFacebook();
-        });
+        JPanel socialPanel = new JPanel();
+        socialPanel.setLayout(new BoxLayout(socialPanel, BoxLayout.Y_AXIS));
+        socialPanel.setBackground(Color.WHITE);
+        socialPanel.setBorder(new EmptyBorder(20, 0, 0, 0));
+        socialPanel.add(lblRegister);
+        socialPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        socialPanel.add(socialButtonsPanel);
 
-        // Add buttons to social media panel
-        pSocialMedia.add(btnGoogle);
-        pSocialMedia.add(btnFacebook);
-
-        pSocialContainer.add(pSocialMedia, BorderLayout.CENTER);
-
-        // Create a panel to hold both the login button and social media panels
-        JPanel southPanel = new JPanel(new BorderLayout(0, 20));
-        southPanel.setBackground(Color.WHITE);
-        southPanel.add(pBotones, BorderLayout.NORTH);
-        southPanel.add(pSocialContainer, BorderLayout.CENTER);
-
+        southPanel.add(socialPanel);
         mainPanel.add(southPanel, BorderLayout.SOUTH);
 
-        this.add(mainPanel);
+        add(mainPanel);
         setVisible(true);
+    }
 
-        // Añade esto justo después de setDefaultCloseOperation(EXIT_ON_CLOSE);
-        // Crear un KeyListener para cerrar con ESC
-        addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    dispose(); // o System.exit(0);
-                }
+    private void addFormField(String labelText, JComponent field, JPanel formPanel) {
+        JLabel label = new JLabel(labelText);
+        label.setFont(new Font("SansSerif", Font.BOLD, 14));
+        formPanel.add(label);
+        formPanel.add(field);
+    }
+
+    private JTextField createStyledTextField() {
+        JTextField textField = new JTextField();
+        textField.setPreferredSize(new Dimension(0, 35));
+        textField.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(42, 112, 165), 1),
+                new EmptyBorder(5, 10, 5, 10)));
+        textField.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        return textField;
+    }
+
+    private JPasswordField createStyledPasswordField() {
+        JPasswordField field = new JPasswordField();
+        field.setPreferredSize(new Dimension(0, 35));
+        field.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(42, 112, 165), 1),
+                new EmptyBorder(5, 10, 5, 10)));
+        field.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        return field;
+    }
+
+    private JButton createSocialButton(String iconPath, Object registerClass) {
+        ImageIcon icon = new ImageIcon(iconPath);
+        Image scaledIcon = icon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+        JButton button = new JButton(new ImageIcon(scaledIcon));
+
+        button.setBorderPainted(false);
+        button.setContentAreaFilled(false);
+        button.setFocusPainted(false);
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.addActionListener(e -> {
+            if (registerClass instanceof RegisterGoogle) {
+                new RegisterGoogle();
+            } else if (registerClass instanceof RegisterFacebook) {
+                new RegisterFacebook();
             }
         });
 
-// Asegurarse de que el frame puede recibir eventos de teclado
-        setFocusable(true);
-
+        return button;
     }
+
     public static void main(String[] args) {
-        Login v = new Login();
-        v.setVisible(true);
+        SwingUtilities.invokeLater(Login::new);
     }
 }
-
-
-
-

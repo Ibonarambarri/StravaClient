@@ -6,7 +6,6 @@ import javax.swing.border.EmptyBorder;
 import java.util.Calendar;
 
 public class RegisterGoogle extends JFrame {
-    private JPanel mainPanel;
     private JPanel formPanel;
     private JTextField txtName;
     private JTextField txtEmail;
@@ -14,10 +13,6 @@ public class RegisterGoogle extends JFrame {
     private JTextField txtHeight;
     private JTextField txtMaxHeartRate;
     private JTextField txtRestHeartRate;
-    private JComboBox<Integer> dayCombo;
-    private JComboBox<Integer> monthCombo;
-    private JComboBox<Integer> yearCombo;
-    private JButton btnRegister;
 
     public RegisterGoogle() {
         setTitle("Register - Strava");
@@ -35,7 +30,7 @@ public class RegisterGoogle extends JFrame {
             }
         });
 
-        mainPanel = new JPanel(new BorderLayout(0, 20));
+        JPanel mainPanel = new JPanel(new BorderLayout(0, 20));
         mainPanel.setBackground(Color.WHITE);
         mainPanel.setBorder(new EmptyBorder(30, 40, 30, 40));
 
@@ -82,9 +77,9 @@ public class RegisterGoogle extends JFrame {
 
         // Initialize ComboBoxes
 
-        dayCombo = new JComboBox<>(generateNumbers(1, 31));
-        monthCombo = new JComboBox<>(generateNumbers(1,12));
-        yearCombo = new JComboBox<>(generateNumbers(1940, Calendar.getInstance().get(Calendar.YEAR)));
+        JComboBox<Integer> dayCombo = new JComboBox<>(generateNumbers(1, 31));
+        JComboBox<Integer> monthCombo = new JComboBox<>(generateNumbers(1, 12));
+        JComboBox<Integer> yearCombo = new JComboBox<>(generateNumbers(1940, Calendar.getInstance().get(Calendar.YEAR)));
 
         // Style ComboBoxes
         styleComboBox(dayCombo);
@@ -116,7 +111,7 @@ public class RegisterGoogle extends JFrame {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonPanel.setBackground(Color.WHITE);
 
-        btnRegister = new JButton("REGISTER");
+        JButton btnRegister = new JButton("REGISTER");
         btnRegister.setPreferredSize(new Dimension(200, 45));
         btnRegister.setBackground(new Color(34, 66, 90));
         btnRegister.setForeground(Color.WHITE);
