@@ -18,8 +18,8 @@ public class SwingController  {
         public String register(User user, String method, String password){
             return serviceProxy.register(user, method, password);
         }
-        String login(String email, String method, String password){
-            return serviceProxy.login(email, method, password);
+        public String login(String email, String password){
+            return serviceProxy.login(email, password);
         }
         String logout(String token){
             return serviceProxy.logout(token);

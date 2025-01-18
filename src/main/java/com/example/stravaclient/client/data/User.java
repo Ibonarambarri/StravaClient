@@ -11,6 +11,5 @@ public record User(
         Double height,
         Integer maxHeartRate,
         Integer restHeartRate
-) {
-}
+) { }
 

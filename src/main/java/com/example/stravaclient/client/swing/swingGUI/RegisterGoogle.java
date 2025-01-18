@@ -1,9 +1,15 @@
 package com.example.stravaclient.client.swing.swingGUI;
+import com.example.stravaclient.client.data.User;
+import com.example.stravaclient.client.swing.SwingController;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.util.Calendar;
+
+import static java.lang.Double.parseDouble;
+import static java.lang.Integer.*;
 
 public class RegisterGoogle extends JFrame {
     private JPanel formPanel;
@@ -13,19 +19,22 @@ public class RegisterGoogle extends JFrame {
     private JTextField txtHeight;
     private JTextField txtMaxHeartRate;
     private JTextField txtRestHeartRate;
+    private final SwingController controller;
 
-    public RegisterGoogle() {
+    public RegisterGoogle(SwingController controller)
+    {
+        this.controller = new SwingController();
         setTitle("Register - Strava");
         setSize(500, 800); // Increased height for more fields
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         // Configurar la tecla ESC para cerrar
         getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "Cancel");
         getRootPane().getActionMap().put("Cancel", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                new Login();
+                new Login(controller);
                 dispose();
             }
         });
@@ -121,6 +130,21 @@ public class RegisterGoogle extends JFrame {
         btnRegister.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnRegister.addActionListener(e -> {
             if (validateForm()) {
+                int day = (int) dayCombo.getSelectedItem();
+                int month = (int) monthCombo.getSelectedItem();
+                int year = (int) yearCombo.getSelectedItem();
+                String birthday = String.format("%04d/%02d/%02d", year, month, day);
+                User user = new User(
+
+                        txtEmail.getText(),
+                        txtName.getText(),
+                        birthday,
+                        parseDouble(txtWeight.getText()),
+                        parseDouble(txtHeight.getText()),
+                        parseInt(txtMaxHeartRate.getText()),
+                        parseInt(txtRestHeartRate.getText())
+                );
+                controller.register(user, "google", String.valueOf(1234));
                 JOptionPane.showMessageDialog(this, "Registration successful!");
                 dispose();
             }
@@ -181,10 +205,10 @@ public class RegisterGoogle extends JFrame {
         }
 
         try {
-            Double.parseDouble(txtWeight.getText());
-            Integer.parseInt(txtHeight.getText());
-            Integer.parseInt(txtMaxHeartRate.getText());
-            Integer.parseInt(txtRestHeartRate.getText());
+            parseDouble(txtWeight.getText());
+            parseInt(txtHeight.getText());
+            parseInt(txtMaxHeartRate.getText());
+            parseInt(txtRestHeartRate.getText());
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this,
                     "Please enter valid numbers for weight, height, and heart rates",
@@ -196,7 +220,7 @@ public class RegisterGoogle extends JFrame {
         return true;
     }
 
-    public static void main(String[] args) {
+   /* public static void main(String[] args) {
         new RegisterGoogle();
-    }
+    }*/
 }

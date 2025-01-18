@@ -1,4 +1,6 @@
 package com.example.stravaclient.client.swing.swingGUI;
+import com.example.stravaclient.client.swing.SwingController;
+
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -6,11 +8,14 @@ import javax.swing.border.EmptyBorder;
 
 public class Login extends JFrame {
 
-    public Login() {
+    private final SwingController controller;
+
+    public Login(SwingController controller) {
+        this.controller = controller;
         setTitle("Strava");
         setSize(500, 800);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         // Configurar la tecla ESC para cerrar
         getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
@@ -113,7 +118,9 @@ public class Login extends JFrame {
         bIniciarSesion.setBorderPainted(false);
         bIniciarSesion.setCursor(new Cursor(Cursor.HAND_CURSOR));
         bIniciarSesion.addActionListener(e -> {
-            new MainUI();
+            controller.login(txtUsuario.getText(), new String(txtPassw.getPassword()));
+            new MainUI(controller);
+
             dispose();
         });
 
@@ -132,8 +139,15 @@ public class Login extends JFrame {
         socialButtonsPanel.setBackground(Color.WHITE);
 
         // Botones de redes sociales
-        JButton googleButton = createSocialButton("src/main/resources/img/google.png", new RegisterGoogle());
-        JButton facebookButton = createSocialButton("src/main/resources/img/facebook.png", new RegisterFacebook());
+        JButton googleButton = createSocialButton("src/main/resources/img/google.png", e -> {
+            new RegisterGoogle(controller);  // Solo se ejecuta al hacer clic
+            dispose();
+        });
+        JButton facebookButton = createSocialButton("src/main/resources/img/facebook.png", e -> {
+            new RegisterFacebook(controller);  // Solo se ejecuta al hacer clic
+            dispose();
+        });
+
 
         socialButtonsPanel.add(googleButton);
         socialButtonsPanel.add(facebookButton);
@@ -180,7 +194,7 @@ public class Login extends JFrame {
         return field;
     }
 
-    private JButton createSocialButton(String iconPath, Object registerClass) {
+    private JButton createSocialButton(String iconPath, ActionListener actionListener) {
         ImageIcon icon = new ImageIcon(iconPath);
         Image scaledIcon = icon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
         JButton button = new JButton(new ImageIcon(scaledIcon));
@@ -189,18 +203,12 @@ public class Login extends JFrame {
         button.setContentAreaFilled(false);
         button.setFocusPainted(false);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        button.addActionListener(e -> {
-            if (registerClass instanceof RegisterGoogle) {
-                new RegisterGoogle();
-            } else if (registerClass instanceof RegisterFacebook) {
-                new RegisterFacebook();
-            }
-        });
+        button.addActionListener(actionListener);  // Se agrega el ActionListener aquí
 
         return button;
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         SwingUtilities.invokeLater(Login::new);
-    }
+    }*/
 }

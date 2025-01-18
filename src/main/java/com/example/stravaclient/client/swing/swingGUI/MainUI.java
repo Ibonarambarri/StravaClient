@@ -1,5 +1,7 @@
 package com.example.stravaclient.client.swing.swingGUI;
 
+import com.example.stravaclient.client.swing.SwingController;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
@@ -22,8 +24,12 @@ public class MainUI extends JFrame {
     private DefaultTableModel modelSessions;
     private final JPanel panelContent;
 
-    public MainUI() {
+
+    private final SwingController controller;
+
+    public MainUI(SwingController controller) {
         setTitle("Strava Client");
+        this.controller = controller;
         setSize(800, 800);
 
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -984,7 +990,7 @@ public class MainUI extends JFrame {
         btnLogout.setBorderPainted(false);
         btnLogout.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnLogout.addActionListener(e -> {
-            new Login();
+            new Login(controller);
             dispose();
         });
 
@@ -1043,7 +1049,7 @@ public class MainUI extends JFrame {
         cl.show(panelContent, panelName);
     }
 
-    public static void main(String[] args) {
+   /* public static void main(String[] args) {
         SwingUtilities.invokeLater(MainUI::new);
-    }
+    }*/
 }

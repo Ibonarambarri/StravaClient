@@ -9,7 +9,7 @@ public interface IStravaServiceProxy {
     //User management
 
     String register(User user, String method, String password);
-    String login(String email, String method, String password);
+    String login(String email, String password);
     String logout(String token);
 
 

@@ -48,10 +48,10 @@ public class HttpServiceProxy implements IStravaServiceProxy {
     }
 
     @Override
-    public String login(String email, String method, String password) {
+    public String login(String email, String password) {
         try{
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(BASE_URL + "/api/users/auth?email=" + email + "&pass=" + password + "&method=" + method))
+                    .uri(URI.create(BASE_URL + "/api/users/auth?email=" + email + "&pass=" + password))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(""))
                     .build();
