@@ -92,15 +92,17 @@ public class HttpServiceProxy implements IStravaServiceProxy {
     public String createChallenge(Challenge challenge, String token) {
         try{
             String challengebody =objectMapper.writeValueAsString(challenge);
+            System.out.println(challengebody);
+            System.out.println(token);
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(BASE_URL + "/api/users/challenges?token=" + token))
+                    .uri(URI.create(BASE_URL + "/api/challenges?token=" + token))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(challengebody))
                     .build();
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             return switch (response.statusCode()) {
-                case 200 -> response.body(); // Successful login, returns token
+                case 201 -> response.body(); // Successful login, returns token
                 case 401 -> throw new RuntimeException("error: Unauthorized");
                 default -> throw new RuntimeException("Challenge Creation failed with status code: " + response.statusCode());
             };
@@ -113,20 +115,20 @@ public class HttpServiceProxy implements IStravaServiceProxy {
     public List<Challenge> getActiveChallenges() {
         try{
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(BASE_URL + "/api/users/challenges"))
+                    .uri(URI.create(BASE_URL + "/api/challenges"))
                     .header("Content-Type", "application/json")
                     .GET()
                     .build();
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
+            System.out.println(response);
             return switch (response.statusCode()) {
-                case 200 ->  objectMapper.convertValue(response.body(), objectMapper.getTypeFactory().constructCollectionType(List.class, Challenge.class));
+                case 200 -> objectMapper.convertValue(response.body(), objectMapper.getTypeFactory().constructCollectionType(List.class, Challenge.class));
                 case 204 -> throw new RuntimeException("No Content: No categories found");
                 case 500 -> throw new RuntimeException("Internal server error while fetching categories");case 401 -> throw new RuntimeException("Unauthorized: Invalid credentials");
                 default -> throw new RuntimeException("Login failed with status code: " + response.statusCode());
             };
         } catch (IOException | InterruptedException e) {
-            throw new RuntimeException("Error during login", e);
+            throw new RuntimeException("Error during fetch", e);
         }
     }
 

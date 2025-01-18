@@ -31,7 +31,7 @@ public class SwingController  {
         public String createChallenge(Challenge challenge, String token){
             return serviceProxy.createChallenge(challenge, token);
         }
-        List<Challenge> getActiveChallenges(){
+        public List<Challenge> getActiveChallenges(){
             return serviceProxy.getActiveChallenges();
         }
         String acceptChallenge(String token, int id){

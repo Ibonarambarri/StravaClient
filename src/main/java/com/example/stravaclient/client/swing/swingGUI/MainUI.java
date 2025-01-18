@@ -248,20 +248,19 @@ public class MainUI extends JFrame {
     }
 
     private void addExampleData() {
-        // Reto aceptado de ejemplo
-        String challenge1 = formatChallengeInfo("Summer Running Challenge", "Distance challenge");
-        String goal1 = formatGoalInfo("Distance", "100", "km");
-        String dates1 = formatDatesInfo("2024-01-01", "2024-02-01");
-        modelChallengesAccepted.addRow(new Object[]{
-                challenge1, "Running", goal1, dates1, 0.25
-        });
+        controller.getActiveChallenges().forEach(challenge -> {
+            String challengeInfo = formatChallengeInfo(challenge.name(), challenge.goalType() + " challenge");
+            String goalInfo = formatGoalInfo(challenge.goalType(), String.valueOf(challenge.goalValue()),
+                    challenge.goalType().equals("Distance") ? "km" : "hours");
+            String datesInfo = formatDatesInfo(challenge.startDate(), challenge.endDate());
 
-        // Reto disponible de ejemplo
-        String challenge2 = formatChallengeInfo("Mountain Biking Week", "Time challenge");
-        String goal2 = formatGoalInfo("Time", "20", "hours");
-        String dates2 = formatDatesInfo("2024-02-01", "2024-02-28");
-        modelChallengesAvailable.addRow(new Object[]{
-                challenge2, "Cycling", goal2, dates2, "Accept"
+            modelChallengesAvailable.addRow(new Object[]{
+                    challengeInfo,
+                    challenge.sport(),
+                    goalInfo,
+                    datesInfo,
+                    0.0
+            });
         });
     }
 
@@ -375,6 +374,7 @@ public class MainUI extends JFrame {
             setBackground(new Color(34, 66, 90));
             setBorderPainted(false);
             setFocusPainted(false);
+
         }
 
         @Override
@@ -436,8 +436,13 @@ public class MainUI extends JFrame {
                     }
                     rowData[4] = 0.0; // Progreso inicial
 
+
+
+
+                   // controller.acceptChallenge(, controller.token);
                     modelChallengesAccepted.addRow(rowData);
                     modelChallengesAvailable.removeRow(selectedRow);
+
                 }
             }
             isPushed = false;
@@ -535,7 +540,10 @@ public class MainUI extends JFrame {
                         Objects.requireNonNull(goalTypeCombo.getSelectedItem()).toString(), goalSpinner.getValue(),
                         startYearCombo, startMonthCombo, startDayCombo,
                         endYearCombo, endMonthCombo, endDayCombo);
-
+                Challenge c = new Challenge(nameField.getText().trim(), String.format("%d-%02d-%02d", startYearCombo.getSelectedItem(), startMonthCombo.getSelectedItem(), startDayCombo.getSelectedItem()),
+                        String.format("%d-%02d-%02d", endYearCombo.getSelectedItem(), endMonthCombo.getSelectedItem(), endDayCombo.getSelectedItem()),
+                        Objects.requireNonNull(goalTypeCombo.getSelectedItem()).toString(), (Integer) goalSpinner.getValue(),Objects.requireNonNull(sportCombo.getSelectedItem()).toString()
+                       );
                 controller.createChallenge(c, controller.token);
                 dialog.dispose();
             }
