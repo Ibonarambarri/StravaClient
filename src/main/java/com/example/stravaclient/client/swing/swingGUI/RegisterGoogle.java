@@ -146,6 +146,7 @@ public class RegisterGoogle extends JFrame {
                 );
                 controller.register(user, "google", String.valueOf(1234));
                 JOptionPane.showMessageDialog(this, "Registration successful!");
+                new Login(controller);
                 dispose();
             }
         });

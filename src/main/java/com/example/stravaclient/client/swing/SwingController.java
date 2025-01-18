@@ -11,7 +11,7 @@ public class SwingController  {
 
     private final IStravaServiceProxy serviceProxy = new HttpServiceProxy();
     // Token to be used during the session
-    private String token;
+    public String token;
 
         //User management
 
@@ -28,7 +28,7 @@ public class SwingController  {
         // Challenge management
 
 
-        String createChallenge(Challenge challenge, String token){
+        public String createChallenge(Challenge challenge, String token){
             return serviceProxy.createChallenge(challenge, token);
         }
         List<Challenge> getActiveChallenges(){

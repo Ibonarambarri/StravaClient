@@ -145,6 +145,7 @@ public class RegisterFacebook extends JFrame {
                 );
                 controller.register(user, "facebook", String.valueOf(1234));
                 JOptionPane.showMessageDialog(this, "Registration successful!");
+                new Login(controller);
                 dispose();
             }
         });

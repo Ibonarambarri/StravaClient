@@ -1,5 +1,6 @@
 package com.example.stravaclient.client.swing.swingGUI;
 
+import com.example.stravaclient.client.data.Challenge;
 import com.example.stravaclient.client.swing.SwingController;
 
 import javax.swing.*;
@@ -534,6 +535,8 @@ public class MainUI extends JFrame {
                         Objects.requireNonNull(goalTypeCombo.getSelectedItem()).toString(), goalSpinner.getValue(),
                         startYearCombo, startMonthCombo, startDayCombo,
                         endYearCombo, endMonthCombo, endDayCombo);
+
+                controller.createChallenge(c, controller.token);
                 dialog.dispose();
             }
         });

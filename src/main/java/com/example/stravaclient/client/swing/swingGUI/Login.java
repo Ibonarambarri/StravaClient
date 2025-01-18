@@ -12,6 +12,7 @@ public class Login extends JFrame {
 
     public Login(SwingController controller) {
         this.controller = controller;
+
         setTitle("Strava");
         setSize(500, 800);
         setLocationRelativeTo(null);
@@ -118,7 +119,8 @@ public class Login extends JFrame {
         bIniciarSesion.setBorderPainted(false);
         bIniciarSesion.setCursor(new Cursor(Cursor.HAND_CURSOR));
         bIniciarSesion.addActionListener(e -> {
-            controller.login(txtUsuario.getText(), new String(txtPassw.getPassword()));
+            String token = controller.login(txtUsuario.getText(), new String(txtPassw.getPassword()));
+            controller.token = token;
             new MainUI(controller);
 
             dispose();
