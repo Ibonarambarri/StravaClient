@@ -1,8 +1,7 @@
 package com.example.stravaclient.client.data;
 
-import java.util.*;
-
 public record Challenge(
+        Integer id,
         String name,
         String startDate,
         String endDate,
