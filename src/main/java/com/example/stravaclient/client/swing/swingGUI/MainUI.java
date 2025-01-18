@@ -24,7 +24,7 @@ public class MainUI extends JFrame {
     private DefaultTableModel modelChallengesAvailable;
     private DefaultTableModel modelSessions;
     private final JPanel panelContent;
-
+    private List challenges;
 
     private final SwingController controller;
 
@@ -119,7 +119,7 @@ public class MainUI extends JFrame {
 
         // Tabla de retos disponibles
         modelChallengesAvailable = new DefaultTableModel(
-                new String[]{"Challenge Info", "Sport", "Goal", "Dates", "Action"}, 0
+                new String[]{"id","Challenge Info", "Sport", "Goal", "Dates", "Action"}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -133,6 +133,12 @@ public class MainUI extends JFrame {
         };
 
         tableChallengesAvailable = new JTable(modelChallengesAvailable);
+        // Ocultar la columna "id"
+        tableChallengesAvailable.getColumnModel().getColumn(0).setMinWidth(0);
+        tableChallengesAvailable.getColumnModel().getColumn(0).setMaxWidth(0);
+        tableChallengesAvailable.getColumnModel().getColumn(0).setPreferredWidth(0);
+        tableChallengesAvailable.getColumnModel().getColumn(0).setResizable(false);
+
         setupTable(tableChallengesAvailable, false);
 
         // Panel para la tabla de retos disponibles
@@ -249,18 +255,23 @@ public class MainUI extends JFrame {
 
     private void addExampleData() {
         controller.getActiveChallenges().forEach(challenge -> {
+            int id = challenge.id();
             String challengeInfo = formatChallengeInfo(challenge.name(), challenge.goalType() + " challenge");
             String goalInfo = formatGoalInfo(challenge.goalType(), String.valueOf(challenge.goalValue()),
                     challenge.goalType().equals("Distance") ? "km" : "hours");
             String datesInfo = formatDatesInfo(challenge.startDate(), challenge.endDate());
 
             modelChallengesAvailable.addRow(new Object[]{
+                    id,
                     challengeInfo,
                     challenge.sport(),
                     goalInfo,
                     datesInfo,
-                    0.0
+                    "Accept"
             });
+
+
+
         });
     }
 
@@ -430,16 +441,13 @@ public class MainUI extends JFrame {
             if (isPushed) {
                 int selectedRow = tableChallengesAvailable.getSelectedRow();
                 if (selectedRow != -1) {
-                    Object[] rowData = new Object[5];
-                    for (int i = 0; i < 4; i++) {
+                    Object[] rowData = new Object[6];
+                    for (int i = 0; i < 5; i++) {
                         rowData[i] = modelChallengesAvailable.getValueAt(selectedRow, i);
                     }
-                    rowData[4] = 0.0; // Progreso inicial
+                    rowData[5] = 0.0; // Progreso inicial
 
-
-
-
-                   // controller.acceptChallenge(, controller.token);
+                    controller.acceptChallenge(controller.token,(Integer) (modelChallengesAvailable.getValueAt(selectedRow,0)));
                     modelChallengesAccepted.addRow(rowData);
                     modelChallengesAvailable.removeRow(selectedRow);
 
@@ -540,7 +548,7 @@ public class MainUI extends JFrame {
                         Objects.requireNonNull(goalTypeCombo.getSelectedItem()).toString(), goalSpinner.getValue(),
                         startYearCombo, startMonthCombo, startDayCombo,
                         endYearCombo, endMonthCombo, endDayCombo);
-                Challenge c = new Challenge(nameField.getText().trim(), String.format("%d-%02d-%02d", startYearCombo.getSelectedItem(), startMonthCombo.getSelectedItem(), startDayCombo.getSelectedItem()),
+                Challenge c = new Challenge(null, nameField.getText().trim(), String.format("%d-%02d-%02d", startYearCombo.getSelectedItem(), startMonthCombo.getSelectedItem(), startDayCombo.getSelectedItem()),
                         String.format("%d-%02d-%02d", endYearCombo.getSelectedItem(), endMonthCombo.getSelectedItem(), endDayCombo.getSelectedItem()),
                         Objects.requireNonNull(goalTypeCombo.getSelectedItem()).toString(), (Integer) goalSpinner.getValue(),Objects.requireNonNull(sportCombo.getSelectedItem()).toString()
                        );
@@ -725,16 +733,18 @@ public class MainUI extends JFrame {
     }
 
     private void addExampleSessionData() {
-        String session1 = String.format("<html>" +
-                        "<div style='padding: 5px;'>" +
-                        "<span style='font-family: SansSerif; font-size: 14px; font-weight: bold; color: rgb(34, 66, 90);'>%s</span><br/>" +
-                        "<span style='font-family: SansSerif; font-size: 13px;'>%s km</span><br/>" +
-                        "<span style='font-family: SansSerif; font-size: 12px; color: rgb(128, 128, 128);'>%s</span>" +
-                        "</div></html>",
-                "Morning Run", "5.2", "30:45");
+       controller.getSessions(controller.token).forEach(session -> {
+            String sessionInfo = formatChallengeInfo(session.title(), session.distance().toString());
 
-        modelSessions.addRow(new Object[]{
-                session1, "Running", "5.2", "2024-01-03", "07:30", "30:45"
+            modelSessions.addRow(new Object[]{
+                    sessionInfo,
+                    session.sport(),
+                    session.distance(),
+                    session.startDate(),
+                    session.startTime(),
+                    session.duration()
+
+            });
         });
     }
 

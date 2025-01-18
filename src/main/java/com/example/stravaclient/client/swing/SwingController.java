@@ -21,6 +21,7 @@ public class SwingController  {
         public String login(String email, String password){
             return serviceProxy.login(email, password);
         }
+
         String logout(String token){
             return serviceProxy.logout(token);
         }
@@ -34,18 +35,19 @@ public class SwingController  {
         public List<Challenge> getActiveChallenges(){
             return serviceProxy.getActiveChallenges();
         }
-        String acceptChallenge(String token, int id){
+        public String acceptChallenge(String token, int id){
             return serviceProxy.acceptChallenge(token, id);
         }
         HashMap<String, String> getChallengeStatus(String token){
             return serviceProxy.getChallengeStatus(token);
         }
+
         // Session management
 
-        String createSession(Session session, String token){
+        public String createSession(Session session, String token){
             return serviceProxy.createSession(session, token);
         }
-        List<Session> getSessions(String token){
+        public List<Session> getSessions(String token){
             return serviceProxy.getSessions(token);
         }
 }

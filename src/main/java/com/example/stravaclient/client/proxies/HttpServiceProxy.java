@@ -1,6 +1,8 @@
 package com.example.stravaclient.client.proxies;
 
 import com.example.stravaclient.client.data.*;
+
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -122,8 +124,8 @@ public class HttpServiceProxy implements IStravaServiceProxy {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             System.out.println(response);
             return switch (response.statusCode()) {
-                case 200 -> objectMapper.convertValue(response.body(), objectMapper.getTypeFactory().constructCollectionType(List.class, Challenge.class));
-                case 204 -> throw new RuntimeException("No Content: No categories found");
+                case 200 -> objectMapper.readValue(response.body(), objectMapper.getTypeFactory().constructCollectionType(List.class, Challenge.class));
+                case 204 -> Collections.EMPTY_LIST;
                 case 500 -> throw new RuntimeException("Internal server error while fetching categories");case 401 -> throw new RuntimeException("Unauthorized: Invalid credentials");
                 default -> throw new RuntimeException("Login failed with status code: " + response.statusCode());
             };
@@ -200,15 +202,15 @@ public class HttpServiceProxy implements IStravaServiceProxy {
 
         try{
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(BASE_URL + "/api/users/sessions?token=" + token))
+                    .uri(URI.create(BASE_URL + "/api/sessions?token=" + token))
                     .header("Content-Type", "application/json")
                     .GET()
                     .build();
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             return switch (response.statusCode()) {
-                case 200 ->  objectMapper.convertValue(response.body(), objectMapper.getTypeFactory().constructCollectionType(List.class, Session.class));
-                case 204 -> throw new RuntimeException("No Content: No categories found");
+                case 200 ->  objectMapper.readValue(response.body(), objectMapper.getTypeFactory().constructCollectionType(List.class, Session.class));
+                case 204 -> Collections.EMPTY_LIST;
                 case 500 -> throw new RuntimeException("Internal server error while fetching categories");case 401 -> throw new RuntimeException("Unauthorized: Invalid credentials");
                 default -> throw new RuntimeException("Retrieval failed with status code: " + response.statusCode());
             };
