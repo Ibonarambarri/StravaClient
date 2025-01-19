@@ -71,7 +71,7 @@ public class RegisterGoogle extends JFrame {
         contentPanel.add(lblTitle, BorderLayout.NORTH);
 
         // Form Panel - Ajustado para más campos
-        formPanel = new JPanel(new GridLayout(15, 1, 0, 5));
+        formPanel = new JPanel(new GridLayout(17, 1, 0, 5));
         formPanel.setBackground(Color.WHITE);
 
         // Email field

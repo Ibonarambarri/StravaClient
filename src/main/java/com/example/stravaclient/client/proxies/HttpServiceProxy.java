@@ -193,7 +193,8 @@ public class HttpServiceProxy implements IStravaServiceProxy {
             return switch (response.statusCode()) {
                 case 200 -> {
                     // Deserializar directamente en un HashMap<Integer, Double>
-                    HashMap<Integer, Double> challengeStatus = objectMapper.readValue(
+                    HashMap<Integer, Double> challengeStatus;
+                    challengeStatus = objectMapper.readValue(
                             response.body(),
                             objectMapper.getTypeFactory().constructMapType(HashMap.class, Integer.class, Double.class)
                     );

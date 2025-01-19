@@ -13,17 +13,16 @@ import static java.lang.Integer.parseInt;
 
 public class RegisterFacebook extends JFrame {
     private final JTextField txtpassword;
-    private JPanel formPanel;
-    private JTextField txtName;
-    private JTextField txtEmail;
-    private JTextField txtWeight;
-    private JTextField txtHeight;
-    private JTextField txtMaxHeartRate;
-    private JTextField txtRestHeartRate;
-    private SwingController controller;
+    private final JPanel formPanel;
+    private final JTextField txtName;
+    private final JTextField txtEmail;
+    private final JTextField txtWeight;
+    private final JTextField txtHeight;
+    private final JTextField txtMaxHeartRate;
+    private final JTextField txtRestHeartRate;
 
     public RegisterFacebook(SwingController controller) {
-        this.controller = new SwingController();
+        new SwingController();
         setTitle("Register - Strava");
         setSize(500, 800); // Increased height for more fields
         setLocationRelativeTo(null);
@@ -71,7 +70,7 @@ public class RegisterFacebook extends JFrame {
         contentPanel.add(lblTitle, BorderLayout.NORTH);
 
         // Form Panel - Ajustado para más campos
-        formPanel = new JPanel(new GridLayout(15, 1, 0, 5));
+        formPanel = new JPanel(new GridLayout(17, 1, 0, 5));
         formPanel.setBackground(Color.WHITE);
 
         // Email field

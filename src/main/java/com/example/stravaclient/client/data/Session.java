@@ -1,6 +1,6 @@
 package com.example.stravaclient.client.data;
 
-import java.util.Objects;
+
 
 public record Session(
         Integer id,

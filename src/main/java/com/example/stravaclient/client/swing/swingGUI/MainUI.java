@@ -10,6 +10,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -528,9 +530,14 @@ public class MainUI extends JFrame {
         JPanel startDatePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         startDatePanel.setBackground(Color.WHITE);
 
-        JComboBox<Integer> startDayCombo = createStyledComboBox(generateNumbers(1, 31));
-        JComboBox<Integer> startMonthCombo = createStyledComboBox(generateNumbers(1, 12));
-        JComboBox<Integer> startYearCombo = createStyledComboBox(generateNumbers(2024, 2025));
+        LocalDate today = LocalDate.now();
+        int currentDay = today.getDayOfMonth();
+        int currentMonth = today.getMonthValue();
+        int currentYear = today.getYear();
+
+        JComboBox<Integer> startDayCombo = createStyledComboBox(generateNumbers(currentDay, 31));
+        JComboBox<Integer> startMonthCombo = createStyledComboBox(generateNumbers(currentMonth, 12));
+        JComboBox<Integer> startYearCombo = createStyledComboBox(generateNumbers(currentYear, currentYear));
 
         startDatePanel.add(startDayCombo);
         startDatePanel.add(createSeparatorLabel("/"));
@@ -544,9 +551,9 @@ public class MainUI extends JFrame {
         JPanel endDatePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         endDatePanel.setBackground(Color.WHITE);
 
-        JComboBox<Integer> endDayCombo = createStyledComboBox(generateNumbers(1, 31));
-        JComboBox<Integer> endMonthCombo = createStyledComboBox(generateNumbers(1, 12));
-        JComboBox<Integer> endYearCombo = createStyledComboBox(generateNumbers(2024, 2025));
+        JComboBox<Integer> endDayCombo = createStyledComboBox(generateNumbers(currentDay, 31));
+        JComboBox<Integer> endMonthCombo = createStyledComboBox(generateNumbers(currentMonth, 12));
+        JComboBox<Integer> endYearCombo = createStyledComboBox(generateNumbers(2025, 2026));
 
         endDatePanel.add(endDayCombo);
         endDatePanel.add(createSeparatorLabel("/"));
@@ -810,10 +817,13 @@ public class MainUI extends JFrame {
         // Panel de fecha
         JPanel datePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         datePanel.setBackground(Color.WHITE);
-
-        JComboBox<Integer> dayCombo = createStyledComboBox(generateNumbers(1, 31));
-        JComboBox<Integer> monthCombo = createStyledComboBox(generateNumbers(1, 12));
-        JComboBox<Integer> yearCombo = createStyledComboBox(generateNumbers(2020, Calendar.getInstance().get(Calendar.YEAR)));
+        LocalDate today = LocalDate.now();
+        int currentDay = today.getDayOfMonth();
+        int currentMonth = today.getMonthValue();
+        int currentYear = today.getYear();
+        JComboBox<Integer> dayCombo = createStyledComboBox(generateNumbers(currentDay, 31));
+        JComboBox<Integer> monthCombo = createStyledComboBox(generateNumbers(currentMonth, 12));
+        JComboBox<Integer> yearCombo = createStyledComboBox(generateNumbers(currentYear, currentYear+1));;
 
         datePanel.add(dayCombo);
         datePanel.add(createSeparatorLabel("/"));
@@ -826,9 +836,11 @@ public class MainUI extends JFrame {
         // Panel de hora
         JPanel timePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         timePanel.setBackground(Color.WHITE);
-
-        JComboBox<Integer> hourCombo = createStyledComboBox(generateNumbers(0, 23));
-        JComboBox<Integer> minuteCombo = createStyledComboBox(generateNumbers(0, 59));
+        LocalDateTime now = LocalDateTime.now();
+        int currentHour = now.getHour();
+        int currentMinute = now.getMinute();
+        JComboBox<Integer> hourCombo = createStyledComboBox(generateNumbers(currentHour, 23));
+        JComboBox<Integer> minuteCombo = createStyledComboBox(generateNumbers(currentMinute, 59));
 
         timePanel.add(hourCombo);
         timePanel.add(createSeparatorLabel(":"));

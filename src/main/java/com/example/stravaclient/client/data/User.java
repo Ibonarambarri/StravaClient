@@ -1,7 +1,6 @@
 package com.example.stravaclient.client.data;
 
 
-import java.util.*;
 
 public record User(
         Integer id,

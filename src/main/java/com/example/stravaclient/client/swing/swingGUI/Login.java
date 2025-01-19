@@ -8,10 +8,7 @@ import javax.swing.border.EmptyBorder;
 
 public class Login extends JFrame {
 
-    private final SwingController controller;
-
     public Login(SwingController controller) {
-        this.controller = controller;
 
         setTitle("Strava");
         setSize(500, 800);
@@ -119,8 +116,7 @@ public class Login extends JFrame {
         bIniciarSesion.setBorderPainted(false);
         bIniciarSesion.setCursor(new Cursor(Cursor.HAND_CURSOR));
         bIniciarSesion.addActionListener(e -> {
-            String token = controller.login(txtUsuario.getText(), new String(txtPassw.getPassword()));
-            controller.token = token;
+            controller.token = controller.login(txtUsuario.getText(), new String(txtPassw.getPassword()));
             new MainUI(controller);
 
             dispose();
@@ -210,7 +206,4 @@ public class Login extends JFrame {
         return button;
     }
 
-    /*public static void main(String[] args) {
-        SwingUtilities.invokeLater(Login::new);
-    }*/
 }
