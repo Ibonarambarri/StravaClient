@@ -182,24 +182,33 @@ public class HttpServiceProxy implements IStravaServiceProxy {
 
     @Override
     public HashMap<Integer, Double> getChallengeStatus(String token) {
-        try{
+        try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(BASE_URL + "/api/challenges/progress?token=" + token))
                     .header("Content-Type", "application/json")
                     .GET()
                     .build();
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
+            System.out.println(response.body());
             return switch (response.statusCode()) {
-                case 200 ->  objectMapper.convertValue(response.body(), objectMapper.getTypeFactory().constructCollectionType(List.class, Challenge.class));
-                case 204 -> new HashMap<Integer, Double>();
-                case 500 -> throw new RuntimeException("Internal server error while fetching categories");case 401 -> throw new RuntimeException("Unauthorized: Invalid credentials");
+                case 200 -> {
+                    // Deserializar directamente en un HashMap<Integer, Double>
+                    HashMap<Integer, Double> challengeStatus = objectMapper.readValue(
+                            response.body(),
+                            objectMapper.getTypeFactory().constructMapType(HashMap.class, Integer.class, Double.class)
+                    );
+                    yield challengeStatus;
+                }
+                case 204 -> new HashMap<>(); // Sin contenido
+                case 500 -> throw new RuntimeException("Internal server error while fetching categories");
+                case 401 -> throw new RuntimeException("Unauthorized: Invalid credentials");
                 default -> throw new RuntimeException("Status failed with status code: " + response.statusCode());
             };
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Error during Status Retrieve", e);
         }
     }
+
 
     // Session Management
     @Override

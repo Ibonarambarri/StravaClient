@@ -260,6 +260,7 @@ public class MainUI extends JFrame {
 
         HashMap<Integer, Double> progressMap = controller.getChallengeStatus(controller.token);
 
+
         controller.getActiveChallenges().forEach(challenge -> {
             int id = challenge.id();
             String challengeInfo = formatChallengeInfo(challenge.name(), challenge.goalType() + " challenge");
@@ -267,7 +268,6 @@ public class MainUI extends JFrame {
                     challenge.goalType().equals("Distance") ? "km" : "hours");
             String datesInfo = formatDatesInfo(challenge.startDate(), challenge.endDate());
             if(!progressMap.containsKey(challenge.id())){
-
 
                 modelChallengesAvailable.addRow(new Object[]{
                         id,
@@ -284,7 +284,7 @@ public class MainUI extends JFrame {
                         challenge.sport(),
                         goalInfo,
                         datesInfo,
-                        progressMap.get(challenge.id())
+                        progressMap.get(challenge.id())/100
                 });
 
             }
