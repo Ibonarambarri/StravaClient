@@ -143,11 +143,14 @@ public class HttpServiceProxy implements IStravaServiceProxy {
                     .POST(HttpRequest.BodyPublishers.ofString(""))
                     .build();
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println(token);
+            System.out.println(response.body());
 
             return switch (response.statusCode()) {
                 case 200 -> response.body(); // Successful login, returns token
                 case 401 -> throw new RuntimeException("Unauthorized: Invalid selection");
                 default -> throw new RuntimeException("Acceptance failed with status code: " + response.statusCode());
+
             };
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Error during Acceptance", e);
@@ -155,7 +158,7 @@ public class HttpServiceProxy implements IStravaServiceProxy {
     }
 
     @Override
-    public HashMap<String, String> getChallengeStatus(String token) {
+    public HashMap<Integer, Double> getChallengeStatus(String token) {
         try{
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(BASE_URL + "/api/challenges/progress?token=" + token))
@@ -166,7 +169,7 @@ public class HttpServiceProxy implements IStravaServiceProxy {
 
             return switch (response.statusCode()) {
                 case 200 ->  objectMapper.convertValue(response.body(), objectMapper.getTypeFactory().constructCollectionType(List.class, Challenge.class));
-                case 204 -> throw new RuntimeException("No Content: No status found");
+                case 204 -> new HashMap<Integer, Double>();
                 case 500 -> throw new RuntimeException("Internal server error while fetching categories");case 401 -> throw new RuntimeException("Unauthorized: Invalid credentials");
                 default -> throw new RuntimeException("Status failed with status code: " + response.statusCode());
             };

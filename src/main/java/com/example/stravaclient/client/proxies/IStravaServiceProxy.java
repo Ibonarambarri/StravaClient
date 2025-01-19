@@ -19,7 +19,7 @@ public interface IStravaServiceProxy {
     String createChallenge(Challenge challenge, String token);
     List<Challenge> getActiveChallenges();
     String acceptChallenge(String token, int id);
-    HashMap<String, String> getChallengeStatus(String token);
+    HashMap<Integer, Double> getChallengeStatus(String token);
 
     // Session management
 

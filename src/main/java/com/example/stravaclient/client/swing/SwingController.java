@@ -38,7 +38,7 @@ public class SwingController  {
         public String acceptChallenge(String token, int id){
             return serviceProxy.acceptChallenge(token, id);
         }
-        HashMap<String, String> getChallengeStatus(String token){
+        public HashMap<Integer, Double> getChallengeStatus(String token){
             return serviceProxy.getChallengeStatus(token);
         }
 

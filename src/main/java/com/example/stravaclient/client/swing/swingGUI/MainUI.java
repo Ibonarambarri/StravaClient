@@ -1,6 +1,7 @@
 package com.example.stravaclient.client.swing.swingGUI;
 
 import com.example.stravaclient.client.data.Challenge;
+import com.example.stravaclient.client.data.Session;
 import com.example.stravaclient.client.swing.SwingController;
 
 import javax.swing.*;
@@ -12,6 +13,7 @@ import java.awt.*;
 import java.util.Calendar;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.HashMap;
 import java.util.Objects;
 import javax.swing.JPopupMenu;
 import javax.swing.JMenuItem;
@@ -123,12 +125,12 @@ public class MainUI extends JFrame {
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column == 4;
+                return column == 5;
             }
 
             @Override
             public Class<?> getColumnClass(int column) {
-                return column == 4 ? JButton.class : Object.class;
+                return column == 5 ? JButton.class : Object.class;
             }
         };
 
@@ -254,25 +256,43 @@ public class MainUI extends JFrame {
     }
 
     private void addExampleData() {
+
+        HashMap<Integer, Double> progressMap = controller.getChallengeStatus(controller.token);
+
         controller.getActiveChallenges().forEach(challenge -> {
             int id = challenge.id();
             String challengeInfo = formatChallengeInfo(challenge.name(), challenge.goalType() + " challenge");
             String goalInfo = formatGoalInfo(challenge.goalType(), String.valueOf(challenge.goalValue()),
                     challenge.goalType().equals("Distance") ? "km" : "hours");
             String datesInfo = formatDatesInfo(challenge.startDate(), challenge.endDate());
+            if(!progressMap.containsKey(challenge.id())){
 
-            modelChallengesAvailable.addRow(new Object[]{
-                    id,
-                    challengeInfo,
-                    challenge.sport(),
-                    goalInfo,
-                    datesInfo,
-                    "Accept"
-            });
+
+                modelChallengesAvailable.addRow(new Object[]{
+                        id,
+                        challengeInfo,
+                        challenge.sport(),
+                        goalInfo,
+                        datesInfo,
+                        "Accept"
+                });
+            }else{
+                modelChallengesAccepted.addRow(new Object[]{
+                        id,
+                        challengeInfo,
+                        challenge.sport(),
+                        goalInfo,
+                        datesInfo,
+                        progressMap.get(challenge.id())
+                });
+
+            }
+
 
 
 
         });
+
     }
 
     private String formatChallengeInfo(String title, String subtitle) {
@@ -442,12 +462,13 @@ public class MainUI extends JFrame {
                 int selectedRow = tableChallengesAvailable.getSelectedRow();
                 if (selectedRow != -1) {
                     Object[] rowData = new Object[6];
-                    for (int i = 0; i < 5; i++) {
-                        rowData[i] = modelChallengesAvailable.getValueAt(selectedRow, i);
+                    for (int i = 1; i < 5; i++) {
+                        rowData[i-1] = modelChallengesAvailable.getValueAt(selectedRow, i);
                     }
                     rowData[5] = 0.0; // Progreso inicial
 
-                    controller.acceptChallenge(controller.token,(Integer) (modelChallengesAvailable.getValueAt(selectedRow,0)));
+                    controller.acceptChallenge(controller.token,(Integer) modelChallengesAvailable.getValueAt(selectedRow,0));
+
                     modelChallengesAccepted.addRow(rowData);
                     modelChallengesAvailable.removeRow(selectedRow);
 
@@ -842,8 +863,21 @@ public class MainUI extends JFrame {
 
         // Configurar acciones de los botones
         saveButton.addActionListener(e -> {
-            // Aquí va la lógica de validación y guardado existente
-            dialog.dispose();
+
+                addNewSession(Objects.requireNonNull(sportCombo.getSelectedItem()).toString(),
+                        (Double) distanceSpinner.getValue(),
+                        dayCombo, monthCombo, yearCombo,
+                        hourCombo, minuteCombo,
+                        hoursSpinner, minutesSpinner, secondsSpinner);
+                Session s = new Session(null, null,, Objects.requireNonNull(sportCombo.getSelectedItem()).toString(), (Double) distanceSpinner.getValue(),
+                        String.format("%d-%02d-%02d", yearCombo.getSelectedItem(), monthCombo.getSelectedItem(), dayCombo.getSelectedItem()),
+                        String.format("%02d:%02d", hourCombo.getSelectedItem(), minuteCombo.getSelectedItem()),
+                        String.format("%02d:%02d:%02d", hoursSpinner.getValue(), minutesSpinner.getValue(), secondsSpinner.getValue())
+                );
+                controller.createSession(s, controller.token);
+                dialog.dispose();
+
+
         });
 
         cancelButton.addActionListener(e -> dialog.dispose());
@@ -851,6 +885,28 @@ public class MainUI extends JFrame {
         dialog.pack();
         dialog.setLocationRelativeTo(this);
         dialog.setVisible(true);
+    }
+
+    private void addNewSession(String string, Double value, JComboBox<Integer> dayCombo, JComboBox<Integer> monthCombo, JComboBox<Integer> yearCombo, JComboBox<Integer> hourCombo, JComboBox<Integer> minuteCombo, JSpinner hoursSpinner, JSpinner minutesSpinner, JSpinner secondsSpinner) {
+        String sessionInfo = formatChallengeInfo(string, value.toString());
+        String dateInfo = formatDatesInfo(
+                String.format("%d-%02d-%02d", yearCombo.getSelectedItem(), monthCombo.getSelectedItem(), dayCombo.getSelectedItem()),
+                String.format("%02d:%02d", hourCombo.getSelectedItem(), minuteCombo.getSelectedItem())
+        );
+        String durationInfo = String.format("%02d:%02d:%02d",
+                hoursSpinner.getValue(), minutesSpinner.getValue(), secondsSpinner.getValue());
+
+        modelSessions.addRow(new Object[]{
+                sessionInfo,
+                string,
+                value,
+                dateInfo,
+                durationInfo
+        });
+
+    }
+
+    private boolean validateSessionForm(JDialog dialog, JSpinner distanceSpinner, JComboBox<Integer> dayCombo, JComboBox<Integer> monthCombo, JComboBox<Integer> yearCombo, JComboBox<Integer> hourCombo, JComboBox<Integer> minuteCombo, JSpinner hoursSpinner, JSpinner minutesSpinner, JSpinner secondsSpinner) {
     }
 
     private JTextField createStyledTextField() {
