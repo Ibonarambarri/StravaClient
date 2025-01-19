@@ -12,6 +12,7 @@ import static java.lang.Double.parseDouble;
 import static java.lang.Integer.parseInt;
 
 public class RegisterFacebook extends JFrame {
+    private final JTextField txtpassword;
     private JPanel formPanel;
     private JTextField txtName;
     private JTextField txtEmail;
@@ -78,6 +79,8 @@ public class RegisterFacebook extends JFrame {
 
         // Name field
         addFormField("Name:", txtName = createStyledTextField());
+        addFormField("Password:", txtpassword = createStyledTextField());
+
 
         // Birthdate fields
         JPanel birthdatePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
@@ -143,7 +146,7 @@ public class RegisterFacebook extends JFrame {
                         parseInt(txtMaxHeartRate.getText()),
                         parseInt(txtRestHeartRate.getText())
                 );
-                controller.register(user, "facebook", String.valueOf(1234));
+                controller.register(user, "facebook",txtpassword.getText());
                 JOptionPane.showMessageDialog(this, "Registration successful!");
                 new Login(controller);
                 dispose();

@@ -79,6 +79,8 @@ public class RegisterGoogle extends JFrame {
 
         // Name field
         addFormField("Name:", txtName = createStyledTextField());
+        JTextField txtpassword;
+        addFormField("Password:", txtpassword = createStyledTextField());
 
         // Birthdate fields
         JPanel birthdatePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
@@ -113,6 +115,7 @@ public class RegisterGoogle extends JFrame {
         // Rest Heart Rate field
         addFormField("Rest Heart Rate:", txtRestHeartRate = createStyledTextField());
 
+
         contentPanel.add(formPanel, BorderLayout.CENTER);
         mainPanel.add(contentPanel, BorderLayout.CENTER);
 
@@ -144,7 +147,7 @@ public class RegisterGoogle extends JFrame {
                         parseInt(txtMaxHeartRate.getText()),
                         parseInt(txtRestHeartRate.getText())
                 );
-                controller.register(user, "google", String.valueOf(1234));
+                controller.register(user, "google", txtpassword.getText());
                 JOptionPane.showMessageDialog(this, "Registration successful!");
                 new Login(controller);
                 dispose();
