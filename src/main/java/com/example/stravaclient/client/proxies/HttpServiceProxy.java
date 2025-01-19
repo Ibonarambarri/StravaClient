@@ -62,6 +62,7 @@ public class HttpServiceProxy implements IStravaServiceProxy {
             return switch (response.statusCode()) {
                 case 200 -> response.body(); // Successful login, returns token
                 case 401 -> throw new RuntimeException("Unauthorized: Invalid credentials");
+                case 500 -> throw new RuntimeException("Usuario no encontrado o contraseña incorrecta");
                 default -> throw new RuntimeException("Login failed with status code: " + response.statusCode());
             };
         } catch (IOException | InterruptedException e) {
