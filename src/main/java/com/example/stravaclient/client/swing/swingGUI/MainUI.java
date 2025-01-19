@@ -29,7 +29,6 @@ public class MainUI extends JFrame {
     private DefaultTableModel modelSessions;
     private JTable tableSessions;
     private final JPanel panelContent;
-    private List challenges;
 
     private final SwingController controller;
 
@@ -354,13 +353,8 @@ public class MainUI extends JFrame {
                 setStringPainted(true);
 
                 // Ajustar color del texto según el progreso
-                if (progress > 0.5) {
-                    setForeground(progressColor);
-                    setBackground(backgroundColor);
-                } else {
-                    setForeground(progressColor);
-                    setBackground(backgroundColor);
-                }
+                setForeground(progressColor);
+                setBackground(backgroundColor);
             }
 
             // Añadir un borde redondeado personalizado
@@ -823,7 +817,7 @@ public class MainUI extends JFrame {
         int currentYear = today.getYear();
         JComboBox<Integer> dayCombo = createStyledComboBox(generateNumbers(currentDay, 31));
         JComboBox<Integer> monthCombo = createStyledComboBox(generateNumbers(currentMonth, 12));
-        JComboBox<Integer> yearCombo = createStyledComboBox(generateNumbers(currentYear, currentYear+1));;
+        JComboBox<Integer> yearCombo = createStyledComboBox(generateNumbers(currentYear, currentYear+1));
 
         datePanel.add(dayCombo);
         datePanel.add(createSeparatorLabel("/"));
@@ -1155,7 +1149,4 @@ public class MainUI extends JFrame {
         cl.show(panelContent, panelName);
     }
 
-   /* public static void main(String[] args) {
-        SwingUtilities.invokeLater(MainUI::new);
-    }*/
 }
