@@ -73,7 +73,7 @@ public class HttpServiceProxy implements IStravaServiceProxy {
     public String logout(String token) {
         try{
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(BASE_URL + "/api/users/by?token=" + token))
+                    .uri(URI.create(BASE_URL + "/api/users/bye?token=" + token))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(""))
                     .build();
@@ -86,6 +86,29 @@ public class HttpServiceProxy implements IStravaServiceProxy {
             };
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Error during logout", e);
+        }
+    }
+
+    @Override
+    public User getInfo(String token){
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/api/users/info?token=" + token))
+                    .header("Content-Type", "application/json")
+                    .GET()
+                    .build();
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            System.out.println(response);
+            System.out.println(response.body());
+            return switch (response.statusCode()) {
+                case 200 -> objectMapper.readValue(response.body(), User.class);
+                case 204 -> null;
+                case 401 -> throw new RuntimeException("Unauthorized: Invalid credentials");
+                case 500 -> throw new RuntimeException("Internal server error while fetching user info");
+                default -> throw new RuntimeException("Request failed with status code: " + response.statusCode());
+            };
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException("Error during fetch", e);
         }
     }
 
@@ -184,7 +207,7 @@ public class HttpServiceProxy implements IStravaServiceProxy {
         try{
             String sessionbody =objectMapper.writeValueAsString(session);
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(BASE_URL + "/api/users/sessions?token=" + token))
+                    .uri(URI.create(BASE_URL + "/api/sessions?token=" + token))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(sessionbody))
                     .build();
@@ -193,6 +216,7 @@ public class HttpServiceProxy implements IStravaServiceProxy {
             return switch (response.statusCode()) {
                 case 200 -> response.body(); // Successful login, returns token
                 case 401 -> throw new RuntimeException("Unauthorized: Invalid credentials");
+                case 201 -> response.body();
                 default -> throw new RuntimeException("Session failed with status code: " + response.statusCode());
             };
         } catch (IOException | InterruptedException e) {

@@ -1,7 +1,7 @@
 package com.example.stravaclient.client.swing.swingGUI;
 
 import com.example.stravaclient.client.data.Challenge;
-import com.example.stravaclient.client.data.Session;
+import com.example.stravaclient.client.data.*;
 import com.example.stravaclient.client.swing.SwingController;
 
 import javax.swing.*;
@@ -25,6 +25,7 @@ public class MainUI extends JFrame {
     private DefaultTableModel modelChallengesAccepted;
     private DefaultTableModel modelChallengesAvailable;
     private DefaultTableModel modelSessions;
+    private JTable tableSessions;
     private final JPanel panelContent;
     private List challenges;
 
@@ -725,7 +726,7 @@ public class MainUI extends JFrame {
             }
         };
 
-        JTable tableSessions = new JTable(modelSessions);
+        tableSessions = new JTable(modelSessions);
         tableSessions.setRowHeight(70);
         tableSessions.setShowGrid(false);
         tableSessions.setBackground(Color.WHITE);
@@ -790,7 +791,8 @@ public class MainUI extends JFrame {
         form.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         // Campos del formulario con estilo mejorado
-        addFormField(form, "Title:", createStyledTextField());
+        JTextField txt = createStyledTextField();
+        addFormField(form, "Title:", txt);
 
         String[] sports = {"Running", "Cycling", "Swimming", "Walking", "Hiking"};
         JComboBox<String> sportCombo = createStyledComboBox(sports);
@@ -864,12 +866,12 @@ public class MainUI extends JFrame {
         // Configurar acciones de los botones
         saveButton.addActionListener(e -> {
 
-                addNewSession(Objects.requireNonNull(sportCombo.getSelectedItem()).toString(),
+                addNewSession(txt.getText(), Objects.requireNonNull(sportCombo.getSelectedItem()).toString(),
                         (Double) distanceSpinner.getValue(),
                         dayCombo, monthCombo, yearCombo,
                         hourCombo, minuteCombo,
                         hoursSpinner, minutesSpinner, secondsSpinner);
-                Session s = new Session(null, null,, Objects.requireNonNull(sportCombo.getSelectedItem()).toString(), (Double) distanceSpinner.getValue(),
+                Session s = new Session(null, null, txt.getText(), Objects.requireNonNull(sportCombo.getSelectedItem()).toString(), (Double) distanceSpinner.getValue(),
                         String.format("%d-%02d-%02d", yearCombo.getSelectedItem(), monthCombo.getSelectedItem(), dayCombo.getSelectedItem()),
                         String.format("%02d:%02d", hourCombo.getSelectedItem(), minuteCombo.getSelectedItem()),
                         String.format("%02d:%02d:%02d", hoursSpinner.getValue(), minutesSpinner.getValue(), secondsSpinner.getValue())
@@ -887,12 +889,12 @@ public class MainUI extends JFrame {
         dialog.setVisible(true);
     }
 
-    private void addNewSession(String string, Double value, JComboBox<Integer> dayCombo, JComboBox<Integer> monthCombo, JComboBox<Integer> yearCombo, JComboBox<Integer> hourCombo, JComboBox<Integer> minuteCombo, JSpinner hoursSpinner, JSpinner minutesSpinner, JSpinner secondsSpinner) {
-        String sessionInfo = formatChallengeInfo(string, value.toString());
-        String dateInfo = formatDatesInfo(
-                String.format("%d-%02d-%02d", yearCombo.getSelectedItem(), monthCombo.getSelectedItem(), dayCombo.getSelectedItem()),
-                String.format("%02d:%02d", hourCombo.getSelectedItem(), minuteCombo.getSelectedItem())
-        );
+    private void addNewSession(String text, String string, Double value, JComboBox<Integer> dayCombo, JComboBox<Integer> monthCombo, JComboBox<Integer> yearCombo, JComboBox<Integer> hourCombo, JComboBox<Integer> minuteCombo, JSpinner hoursSpinner, JSpinner minutesSpinner, JSpinner secondsSpinner) {
+        String sessionInfo = formatChallengeInfo(text, value.toString());
+        String dateInfo =
+                String.format("%d-%02d-%02d", yearCombo.getSelectedItem(), monthCombo.getSelectedItem(), dayCombo.getSelectedItem());
+        String hourinfo = String.format("%02d:%02d",
+                hourCombo.getSelectedItem(), minuteCombo.getSelectedItem());
         String durationInfo = String.format("%02d:%02d:%02d",
                 hoursSpinner.getValue(), minutesSpinner.getValue(), secondsSpinner.getValue());
 
@@ -901,13 +903,18 @@ public class MainUI extends JFrame {
                 string,
                 value,
                 dateInfo,
+                hourinfo,
                 durationInfo
         });
+        modelSessions.fireTableDataChanged();
+        tableSessions.revalidate();
+        tableSessions.repaint();
+
+
 
     }
 
-    private boolean validateSessionForm(JDialog dialog, JSpinner distanceSpinner, JComboBox<Integer> dayCombo, JComboBox<Integer> monthCombo, JComboBox<Integer> yearCombo, JComboBox<Integer> hourCombo, JComboBox<Integer> minuteCombo, JSpinner hoursSpinner, JSpinner minutesSpinner, JSpinner secondsSpinner) {
-    }
+
 
     private JTextField createStyledTextField() {
         JTextField field = new JTextField();
@@ -1013,13 +1020,13 @@ public class MainUI extends JFrame {
         basicInfoPanel.setLayout(new BoxLayout(basicInfoPanel, BoxLayout.Y_AXIS));
         basicInfoPanel.setBackground(Color.WHITE);
         basicInfoPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
-
-        JLabel nameLabel = new JLabel("John Doe");
+        User user =controller.getInformation(controller.token);
+        JLabel nameLabel = new JLabel(user.name());
         nameLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
         nameLabel.setForeground(new Color(34, 66, 90));
         nameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel emailLabel = new JLabel("john.doe@example.com");
+        JLabel emailLabel = new JLabel(user.email());
         emailLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
         emailLabel.setForeground(new Color(128, 128, 128));
         emailLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -1037,17 +1044,17 @@ public class MainUI extends JFrame {
         ));
 
         // Crear los paneles de datos con el mismo estilo que los campos
-        statsPanel.add(createDataPanel("Height", "180 cm"));
-        statsPanel.add(createDataPanel("Weight", "75 kg"));
-        statsPanel.add(createDataPanel("Max HR", "185 bpm"));
-        statsPanel.add(createDataPanel("Rest HR", "60 bpm"));
+        statsPanel.add(createDataPanel("Height", String.valueOf(user.height())));
+        statsPanel.add(createDataPanel("Weight", String.valueOf(user.weight())));
+        statsPanel.add(createDataPanel("Max HR", String.valueOf(user.maxHeartRate())));
+        statsPanel.add(createDataPanel("Rest HR", String.valueOf(user.restHeartRate())));
 
         // Panel de fecha de nacimiento
         JPanel birthdatePanel = new JPanel();
         birthdatePanel.setLayout(new BoxLayout(birthdatePanel, BoxLayout.Y_AXIS));
         birthdatePanel.setBackground(Color.WHITE);
         birthdatePanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
-        birthdatePanel.add(createDataPanel("Birthdate", "1990-01-01"));
+        birthdatePanel.add(createDataPanel("Birthdate", user.birthdate()));
         birthdatePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Añadir todos los paneles al panel de información
@@ -1067,6 +1074,7 @@ public class MainUI extends JFrame {
         btnLogout.setBorderPainted(false);
         btnLogout.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btnLogout.addActionListener(e -> {
+            controller.logout(controller.token);
             new Login(controller);
             dispose();
         });

@@ -22,7 +22,7 @@ public class SwingController  {
             return serviceProxy.login(email, password);
         }
 
-        String logout(String token){
+        public String logout(String token){
             return serviceProxy.logout(token);
         }
 
@@ -49,5 +49,8 @@ public class SwingController  {
         }
         public List<Session> getSessions(String token){
             return serviceProxy.getSessions(token);
+        }
+        public User getInformation(String token){
+            return serviceProxy.getInfo(token);
         }
 }

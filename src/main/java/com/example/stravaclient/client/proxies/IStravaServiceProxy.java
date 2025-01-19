@@ -16,6 +16,8 @@ public interface IStravaServiceProxy {
     // Challenge management
 
 
+    User getInfo(String token);
+
     String createChallenge(Challenge challenge, String token);
     List<Challenge> getActiveChallenges();
     String acceptChallenge(String token, int id);

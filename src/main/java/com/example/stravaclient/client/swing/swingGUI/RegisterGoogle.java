@@ -135,7 +135,7 @@ public class RegisterGoogle extends JFrame {
                 int year = (int) yearCombo.getSelectedItem();
                 String birthday = String.format("%04d/%02d/%02d", year, month, day);
                 User user = new User(
-
+                        0,
                         txtEmail.getText(),
                         txtName.getText(),
                         birthday,
