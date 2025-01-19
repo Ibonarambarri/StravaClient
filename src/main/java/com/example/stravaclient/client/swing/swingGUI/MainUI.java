@@ -103,7 +103,7 @@ public class MainUI extends JFrame {
 
         // Tabla de retos aceptados
         modelChallengesAccepted = new DefaultTableModel(
-                new String[]{"Challenge Info", "Sport", "Goal", "Dates", "Progress"}, 0
+                new String[]{"id", "Challenge Info", "Sport", "Goal", "Dates", "Progress"}, 0
         ) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -118,7 +118,7 @@ public class MainUI extends JFrame {
         JPanel acceptedPanel = createTablePanel(tableChallengesAccepted, "Active Challenges");
 
         // Configurar el renderer para la barra de progreso
-        tableChallengesAccepted.getColumnModel().getColumn(4).setCellRenderer(new ModernProgressRenderer());
+        tableChallengesAccepted.getColumnModel().getColumn(5).setCellRenderer(new ModernProgressRenderer());
 
         // Tabla de retos disponibles
         modelChallengesAvailable = new DefaultTableModel(
@@ -146,7 +146,10 @@ public class MainUI extends JFrame {
 
         // Panel para la tabla de retos disponibles
         JPanel availablePanel = createTablePanel(tableChallengesAvailable, "Available Challenges");
-
+        tableChallengesAccepted.getColumnModel().getColumn(0).setMinWidth(0);
+        tableChallengesAccepted.getColumnModel().getColumn(0).setMaxWidth(0);
+        tableChallengesAccepted.getColumnModel().getColumn(0).setPreferredWidth(0);
+        tableChallengesAccepted.getColumnModel().getColumn(0).setResizable(false);
         // Configurar el renderer y editor para los botones de aceptar
         tableChallengesAvailable.getColumn("Action").setCellRenderer(new ModernButtonRenderer());
         tableChallengesAvailable.getColumn("Action").setCellEditor(new ModernButtonEditor(new JCheckBox()));
@@ -469,9 +472,9 @@ public class MainUI extends JFrame {
                     rowData[5] = 0.0; // Progreso inicial
 
                     controller.acceptChallenge(controller.token,(Integer) modelChallengesAvailable.getValueAt(selectedRow,0));
-
-                    modelChallengesAccepted.addRow(rowData);
-                    modelChallengesAvailable.removeRow(selectedRow);
+                    modelChallengesAvailable.setRowCount(0);
+                    modelChallengesAccepted.setRowCount(0);
+                   addExampleData();
 
                 }
             }
@@ -570,11 +573,14 @@ public class MainUI extends JFrame {
                         Objects.requireNonNull(goalTypeCombo.getSelectedItem()).toString(), goalSpinner.getValue(),
                         startYearCombo, startMonthCombo, startDayCombo,
                         endYearCombo, endMonthCombo, endDayCombo);
-                Challenge c = new Challenge(null, nameField.getText().trim(), String.format("%d-%02d-%02d", startYearCombo.getSelectedItem(), startMonthCombo.getSelectedItem(), startDayCombo.getSelectedItem()),
+                Challenge c = new Challenge(0, nameField.getText().trim(), String.format("%d-%02d-%02d", startYearCombo.getSelectedItem(), startMonthCombo.getSelectedItem(), startDayCombo.getSelectedItem()),
                         String.format("%d-%02d-%02d", endYearCombo.getSelectedItem(), endMonthCombo.getSelectedItem(), endDayCombo.getSelectedItem()),
                         Objects.requireNonNull(goalTypeCombo.getSelectedItem()).toString(), (Integer) goalSpinner.getValue(),Objects.requireNonNull(sportCombo.getSelectedItem()).toString()
                        );
                 controller.createChallenge(c, controller.token);
+                modelChallengesAvailable.setRowCount(0);
+                modelChallengesAccepted.setRowCount(0);
+                addExampleData();
                 dialog.dispose();
             }
         });
@@ -877,6 +883,9 @@ public class MainUI extends JFrame {
                         String.format("%02d:%02d:%02d", hoursSpinner.getValue(), minutesSpinner.getValue(), secondsSpinner.getValue())
                 );
                 controller.createSession(s, controller.token);
+            modelChallengesAvailable.setRowCount(0);
+            modelChallengesAccepted.setRowCount(0);
+            addExampleData();
                 dialog.dispose();
 
 
